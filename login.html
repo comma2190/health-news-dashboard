@@ -1,11 +1,56 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>로그인</title>
+<style>
+body{
+  background:#0f0f13;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:sans-serif;
+}
+.box{
+  width:320px;
+}
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+}
+button{
+  width:100%;
+  padding:12px;
+}
+</style>
+</head>
 <body>
+<div class="box">
+<h2>비밀번호 입력</h2>
+<input type="password" id="pw">
+<button onclick="login()">입장</button>
+<p id="msg"></p>
+</div>
 
-<h2>암구호</h2>
+<script>
+async function login(){
+  const password=document.getElementById('pw').value;
 
+  const res=await fetch('/api/login',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password})
+  });
+
+  if(res.ok){
+    location.href='/';
+  }else{
+    document.getElementById('msg').textContent='비밀번호가 틀렸습니다.';
+  }
+}
+</script>
 </body>
-
 </html>
