@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XI0 뉴스 수집기</title>
+<title>뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -68,11 +68,7 @@
   /* 그래프 */
   .chart-wrap { padding:1rem 1.2rem; border-top:1px solid var(--border); background:var(--surface2); }
   .chart-title { font-size:0.72rem; color:var(--text2); margin-bottom:0.8rem; }
-  .chart { display:flex; align-items:flex-end; gap:2px; height:60px; }
-  .chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; height:100%; justify-content:flex-end; }
-  .chart-bar { width:100%; background:var(--accent); border-radius:2px 2px 0 0; min-height:1px; transition:height 0.4s; opacity:0.7; }
-  .chart-bar.peak { background:var(--warning); opacity:1; }
-  .chart-date { font-size:0.55rem; color:var(--text2); font-family:'JetBrains Mono',monospace; writing-mode:vertical-rl; transform:rotate(180deg); height:30px; overflow:hidden; }
+  .chart-svg { width:100%; overflow:visible; }
 
   /* 기사 목록 */
   .articles-wrap { display:none; border-top:1px solid var(--border); }
@@ -243,16 +239,14 @@ async function fetchNaver(keyword, startDate, endDate) {
 }
 
 function buildDateChart(articles, startDate, endDate) {
-  // 날짜별 건수 집계
   const dateCounts = {};
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
-  // 날짜 범위 초기화
+
   for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
     dateCounts[d.toISOString().split('T')[0]] = 0;
   }
-  
+
   articles.forEach(a => {
     if (dateCounts[a.dateStr] !== undefined) dateCounts[a.dateStr]++;
   });
@@ -260,21 +254,66 @@ function buildDateChart(articles, startDate, endDate) {
   const dates = Object.keys(dateCounts).sort();
   const counts = dates.map(d => dateCounts[d]);
   const maxCount = Math.max(...counts, 1);
-  
-  // 피크 날짜
+
   const peakIdx = counts.indexOf(Math.max(...counts));
   const peakDate = dates[peakIdx];
   const peakCount = counts[peakIdx];
 
-  const bars = dates.map((d, i) => {
-    const h = Math.max(1, Math.round((counts[i] / maxCount) * 56));
-    const isPeak = i === peakIdx && counts[i] > 0;
-    const label = d.slice(5); // MM-DD
-    return `<div class="chart-bar-wrap">
-      <div class="chart-bar${isPeak?' peak':''}" style="height:${h}px" title="${d}: ${counts[i]}건"></div>
-      <div class="chart-date">${label}</div>
-    </div>`;
+  // SVG 라인 차트
+  const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
+  const n = dates.length;
+  const xStep = n > 1 ? (W - padL - padR) / (n - 1) : 0;
+
+  const pts = counts.map((c, i) => {
+    const x = padL + i * xStep;
+    const y = padT + (1 - c / maxCount) * (H - padT - padB);
+    return [x, y];
+  });
+
+  // 폴리라인
+  const polyline = pts.map(([x,y]) => `${x},${y}`).join(' ');
+
+  // 영역 fill
+  const areaPath = `M${padL},${H-padB} ` +
+    pts.map(([x,y]) => `L${x},${y}`).join(' ') +
+    ` L${padL + (n-1)*xStep},${H-padB} Z`;
+
+  // 날짜 라벨 (최대 8개)
+  const labelStep = Math.max(1, Math.ceil(n / 8));
+  const labels = dates.map((d, i) => {
+    if (i % labelStep !== 0 && i !== n-1) return '';
+    const x = padL + i * xStep;
+    return `<text x="${x}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
   }).join('');
+
+  // 피크 포인트
+  const [px, py] = pts[peakIdx];
+  const peakDot = peakCount > 0
+    ? `<circle cx="${px}" cy="${py}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>
+       <text x="${px}" y="${py-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${peakCount}</text>`
+    : '';
+
+  // 일반 포인트
+  const dots = pts.map(([x,y], i) => {
+    if (i === peakIdx) return '';
+    return counts[i] > 0
+      ? `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.8"/>`
+      : '';
+  }).join('');
+
+  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaPath}" fill="url(#areaGrad)"/>
+    <polyline points="${polyline}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    ${peakDot}
+    ${labels}
+  </svg>`;
 
   return { bars, peakDate, peakCount, dateCounts };
 }
