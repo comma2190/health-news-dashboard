@@ -1,23 +1,24 @@
-import { NextResponse } from 'next/server';
-
 export function middleware(req) {
+  const url = new URL(req.url);
+  const path = url.pathname;
 
-  const auth = req.cookies.get('auth');
-
-  const path = req.nextUrl.pathname;
-
-  if(
+  if (
     path === '/login.html' ||
-    path.startsWith('/api/login')
-  ){
-    return NextResponse.next();
+    path.startsWith('/api/login') ||
+    path === '/favicon.ico'
+  ) {
+    return;
   }
 
-  if(auth?.value === 'ok'){
-    return NextResponse.next();
+  const auth = req.cookies.get('auth')?.value;
+
+  if (auth === 'ok') {
+    return;
   }
 
-  return NextResponse.redirect(
-    new URL('/login.html', req.url)
-  );
+  return Response.redirect(new URL('/login.html', req.url));
 }
+
+export const config = {
+  matcher: '/:path*',
+};
