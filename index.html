@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>보건의료·돌봄 뉴스 수집기</title>
+<title>XI0 뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -79,21 +79,11 @@
 <body>
 <header>
   <div>
-    <h1>보건의료·돌봄 <span>뉴스 수집기</span></h1>
+    <h1>XI0 <span>뉴스 수집기</span></h1>
     <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
   </div>
   <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
-
-<div class="card" id="apiCard">
-  <div class="section-title">API 키 설정</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:end">
-    <div><label>Client ID</label><input type="password" id="naverId" placeholder="네이버 Client ID"></div>
-    <div><label>Client Secret</label><input type="password" id="naverSecret" placeholder="네이버 Client Secret"></div>
-    <button class="btn btn-secondary" onclick="saveApiKey()">저장</button>
-  </div>
-  <p style="font-size:0.72rem;color:var(--text2);margin-top:0.8rem">API 키는 이 브라우저에만 저장됩니다. 외부에 전송되지 않습니다.</p>
-</div>
 
 <div class="card">
   <div class="section-title">수집 설정</div>
@@ -210,17 +200,13 @@ async function fetchNaver(keyword, startDate, endDate) {
 
   while (!reachedEnd && startIdx <= 1000) {
     const apiUrl = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(keyword)}&display=100&start=${startIdx}&sort=date`;
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl + '&clientId=' + NAVER_ID + '&clientSecret=' + NAVER_SECRET)}`;
 
     try {
-      const res = await fetch(proxyUrl, {
-        headers: {
-          'X-Naver-Client-Id': NAVER_ID,
-          'X-Naver-Client-Secret': NAVER_SECRET,
-        }
-      });
+      const res = await fetch(proxyUrl);
       if (!res.ok) break;
-      const data = await res.json();
+      const wrapper = await res.json();
+      const data = JSON.parse(wrapper.contents);
       if (!data.items || data.items.length === 0) break;
 
       for (const item of data.items) {
