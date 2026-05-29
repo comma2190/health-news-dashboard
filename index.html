@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>뉴스 수집기</title>
+<title> 뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -118,7 +118,7 @@
   </div>
   <div class="keywords-grid" id="kwGrid"></div>
   <div class="add-row">
-    <input type="text" id="newKw" placeholder="키워드 추가..." onkeydown="if(event.key==='Enter')addKw()">
+    <input type="text" id="newKw" placeholder="키워드 추가..." onkeydown="if(event.key==='Enter'&&!event.isComposing)addKw()">
     <select id="newCat">
       <option value="medical">보건의료</option>
       <option value="care">돌봄</option>
@@ -159,17 +159,6 @@ function initDates() {
   document.getElementById('endDate').value = today;
 }
 
-function saveKwToStorage() {
-  localStorage.setItem('xio_keywords', JSON.stringify(keywords));
-}
-
-function loadKwFromStorage() {
-  const saved = localStorage.getItem('xio_keywords');
-  if (saved) {
-    try { keywords = JSON.parse(saved); } catch(e) {}
-  }
-}
-
 function renderKw() {
   document.getElementById('kwGrid').innerHTML = keywords.map((k, i) => `
     <div class="kw-tag active" id="kw${i}" onclick="toggleKw(${i})">
@@ -179,8 +168,8 @@ function renderKw() {
   document.getElementById('kwCount').textContent = `${keywords.length}개`;
 }
 
-function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); saveKwToStorage(); }
-function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); saveKwToStorage(); }
+function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); }
+function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); }
 function addKw() {
   const v = document.getElementById('newKw').value.trim();
   const c = document.getElementById('newCat').value;
@@ -188,7 +177,7 @@ function addKw() {
   keywords.push({text:v, cat:c});
   document.getElementById('newKw').value = '';
   renderKw();
-  saveKwToStorage();
+ 
 }
 
 function addLog(msg, type='info') {
@@ -427,7 +416,6 @@ function copyTable() {
 }
 
 initDates();
-loadKwFromStorage();
 renderKw();
 </script>
 </body>
