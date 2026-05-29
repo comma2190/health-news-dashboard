@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>뉴스 수집기</title>
+<title>보건의료 뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -95,8 +95,9 @@
 <body>
 <header>
   <div>
-    <h1>보건의료 <span>뉴스 수집기</span></h1>
-    <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집 - 그래프:선택일자별 언론게시량(보라) 선택일자별 검색트랜드(오렌지)</p>
+    <h1>XI0 <span>뉴스 수집기</span></h1>
+    <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
+    <p class="subtitle">그래프: <span style="color:#7c6af7">선택일자별 언론게시량(보라)</span> <span style="color:#f7a94f">선택일자별 검색트랜드(오렌지)</span></p>
   </div>
   <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
@@ -317,35 +318,45 @@ function buildSearchChart(datalabData) {
 
   const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
   const n = points.length;
-  const xStep = n > 1 ? (W - padL - padR) / (n - 1) : 0;
+  if (n < 2) return null;
+  const xStep = (W - padL - padR) / (n - 1);
 
-  const pts = values.map((v, i) => [padL + i * xStep, padT + (1 - v / maxVal) * (H - padT - padB)]);
-  const polyline = pts.map(([x,y]) => `${x},${y}`).join(' ');
-  const areaPath = `M${padL},${H-padB} ` + pts.map(([x,y]) => `L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H-padB} Z`;
+  const pts = values.map((v, i) => [
+    padL + i * xStep,
+    padT + (1 - v / maxVal) * (H - padT - padB)
+  ]);
 
+  // 선형 경로
+  const linePath = 'M' + pts.map(([x,y]) => `${x},${y}`).join(' L');
+
+  // 영역 fill
+  const areaPath = `M${padL},${H-padB} L` + pts.map(([x,y]) => `${x},${y}`).join(' L') + ` L${pts[n-1][0]},${H-padB} Z`;
+
+  // 날짜 라벨
   const labelStep = Math.max(1, Math.ceil(n / 8));
   const labels = dates.map((d, i) => {
     if (i % labelStep !== 0 && i !== n-1) return '';
-    return `<text x="${padL+i*xStep}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d}</text>`;
+    return `<text x="${pts[i][0]}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d}</text>`;
   }).join('');
 
+  // 피크 포인트
   const [px, py] = pts[peakIdx];
-  const peakDot = `<circle cx="${px}" cy="${py}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>
-    <text x="${px}" y="${py-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${values[peakIdx]}</text>`;
+  const peakDot = values[peakIdx] > 0
+    ? `<circle cx="${px}" cy="${py}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>
+       <text x="${px}" y="${py-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${values[peakIdx]}</text>`
+    : '';
 
-  const dots = pts.map(([x,y], i) => i === peakIdx || values[i] === 0 ? '' :
-    `<circle cx="${x}" cy="${y}" r="2.5" fill="#f7a94f" opacity="0.8"/>`).join('');
-
-  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:90px;overflow:visible">
     <defs>
       <linearGradient id="searchGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#f7a94f" stop-opacity="0.3"/>
+        <stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/>
         <stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/>
       </linearGradient>
     </defs>
     <path d="${areaPath}" fill="url(#searchGrad)"/>
-    <polyline points="${polyline}" fill="none" stroke="#f7a94f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    ${dots}${peakDot}${labels}
+    <path d="${linePath}" fill="none" stroke="#f7a94f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${peakDot}
+    ${labels}
   </svg>`;
 }
 
@@ -419,13 +430,14 @@ function renderResults(s, e) {
       </div>
       ${r.count > 0 ? `
       <div class="chart-wrap">
-        <div class="chart-title" style="display:flex;gap:1.5rem">
-          <span style="color:#7c6af7">● 뉴스 보도량</span>
-          ${r.searchBars ? '<span style="color:#f7a94f">● 검색량 트렌드</span>' : ''}
-        </div>
-        <div style="margin-bottom:0.3rem"><div class="chart">${r.bars}</div></div>
-        ${r.searchBars ? `<div style="margin-top:0.5rem"><div class="chart">${r.searchBars}</div></div>` : ''}
-      </div>` : ''}
+        <div class="chart-title" style="color:#7c6af7;margin-bottom:0.5rem">● 뉴스 보도량</div>
+        <div class="chart">${r.bars}</div>
+      </div>
+      ${r.searchBars ? `
+      <div class="chart-wrap" style="border-top:1px solid var(--border)">
+        <div class="chart-title" style="color:#f7a94f;margin-bottom:0.5rem">● 검색량 트렌드</div>
+        <div class="chart">${r.searchBars}</div>
+      </div>` : ''}` : ''}
       <div class="articles-wrap" id="card${i}">
         ${r.articles.length > 0 ? r.articles.map((a, j) => `
           <div class="article-item">
