@@ -198,31 +198,54 @@ async function fetchNaver(keyword, startDate, endDate) {
   const NAVER_ID = localStorage.getItem('naver_id') || '';
   const NAVER_SECRET = localStorage.getItem('naver_secret') || '';
   if (!NAVER_ID || !NAVER_SECRET) { alert('API 키를 먼저 저장해주세요'); return {count:0,title:'키 없음',source:''}; }
-  const s = startDate.replace(/-/g,'');
-  const e = endDate.replace(/-/g,'');
-  // CORS 프록시 경유
-  const apiUrl = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(keyword)}&display=100&start=1&sort=date&startDate=${s}&endDate=${e}`;
-  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
-  
-  try {
-    const res = await fetch(proxyUrl, {
-      headers: {
-        'X-Naver-Client-Id': NAVER_ID,
-        'X-Naver-Client-Secret': NAVER_SECRET,
+
+  const startMs = new Date(startDate).getTime();
+  const endMs = new Date(endDate + 'T23:59:59').getTime();
+
+  let count = 0;
+  let title = '-';
+  let source = '-';
+  let startIdx = 1;
+  let reachedEnd = false;
+
+  while (!reachedEnd && startIdx <= 1000) {
+    const apiUrl = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(keyword)}&display=100&start=${startIdx}&sort=date`;
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+
+    try {
+      const res = await fetch(proxyUrl, {
+        headers: {
+          'X-Naver-Client-Id': NAVER_ID,
+          'X-Naver-Client-Secret': NAVER_SECRET,
+        }
+      });
+      if (!res.ok) break;
+      const data = await res.json();
+      if (!data.items || data.items.length === 0) break;
+
+      for (const item of data.items) {
+        const pubMs = new Date(item.pubDate).getTime();
+        if (pubMs > endMs) continue; // 범위 이후 기사 스킵
+        if (pubMs < startMs) { reachedEnd = true; break; } // 범위 이전 → 종료
+
+        count++;
+        if (count === 1) {
+          title = item.title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#0*39;/g,"'");
+          try { source = new URL(item.originallink || item.link).hostname.replace('www.',''); } catch(e){}
+        }
       }
-    });
-    if (!res.ok) throw new Error('API 오류: ' + res.status);
-    const data = await res.json();
-    let title = '-', source = '-';
-    if (data.items?.length > 0) {
-      title = data.items[0].title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#0*39;/g,"'");
-      try { source = new URL(data.items[0].originallink || data.items[0].link).hostname.replace('www.',''); } catch(e){}
+
+      if (data.items.length < 100) break; // 마지막 페이지
+      startIdx += 100;
+      await new Promise(r => setTimeout(r, 200)); // API 부하 방지
+
+    } catch(err) {
+      console.error(err);
+      break;
     }
-    return { count: data.total || 0, title, source };
-  } catch(err) {
-    console.error(err);
-    return { count: 0, title: '오류', source: '' };
   }
+
+  return { count, title, source };
 }
 
 async function startCollection() {
