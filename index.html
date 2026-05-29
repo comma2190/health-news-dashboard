@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>보건의료·돌봄 뉴스 수집기</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root {
+    --bg: #0f0f13; --surface: #16161d; --surface2: #1e1e28;
+    --border: #2a2a38; --accent: #7c6af7; --accent2: #4fc3f7;
+    --text: #e8e8f0; --text2: #8888a8;
+    --success: #4caf82; --warning: #f7a94f; --error: #f76a6a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding:2rem; }
+  header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+  h1 { font-size:1.4rem; font-weight:700; letter-spacing:-0.02em; }
+  h1 span { color:var(--accent); }
+  .subtitle { font-size:0.8rem; color:var(--text2); margin-top:0.3rem; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; }
+  .section-title { font-size:0.75rem; font-weight:600; color:var(--text2); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
+  .controls { display:grid; grid-template-columns:1fr 1fr auto auto; gap:1rem; align-items:end; }
+  label { display:block; font-size:0.72rem; color:var(--text2); margin-bottom:0.4rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
+  input[type=date], input[type=text], select {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:8px; padding:0.6rem 0.8rem; color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:0.85rem; outline:none;
+    transition:border-color 0.2s;
+  }
+  input:focus, select:focus { border-color:var(--accent); }
+  .btn { padding:0.65rem 1.4rem; border-radius:8px; border:none; font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .btn-primary { background:var(--accent); color:white; }
+  .btn-primary:hover { background:#6a58e8; transform:translateY(-1px); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
+  .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
+  .keywords-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.5rem; margin-bottom:1rem; }
+  .kw-tag { display:flex; align-items:center; gap:0.4rem; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:0.4rem 0.7rem; font-size:0.82rem; cursor:pointer; transition:all 0.15s; user-select:none; }
+  .kw-tag.active { border-color:var(--accent); background:rgba(124,106,247,0.1); color:var(--accent); }
+  .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .dot-medical { background:var(--accent); }
+  .dot-care { background:var(--accent2); }
+  .add-row { display:flex; gap:0.5rem; padding-top:1rem; border-top:1px solid var(--border); }
+  .add-row input { flex:1; }
+  .add-row select { width:120px; }
+  .progress-wrap { display:none; }
+  .progress-wrap.show { display:block; }
+  .bar-bg { background:var(--surface2); border-radius:100px; height:6px; margin:0.8rem 0; overflow:hidden; }
+  .bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:100px; transition:width 0.4s; width:0%; }
+  .status { font-size:0.8rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+  .log { background:var(--surface2); border-radius:8px; padding:0.8rem; margin-top:0.8rem; max-height:140px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.8; }
+  .ok { color:var(--success); } .err { color:var(--error); } .info { color:var(--text2); }
+  .results-wrap { display:none; }
+  .results-wrap.show { display:block; }
+  .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  table { width:100%; border-collapse:collapse; background:var(--surface); border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  thead tr { background:var(--surface2); }
+  th { padding:0.8rem 1rem; font-size:0.72rem; color:var(--text2); font-weight:600; letter-spacing:0.06em; text-transform:uppercase; text-align:left; border-bottom:1px solid var(--border); }
+  td { padding:0.75rem 1rem; font-size:0.85rem; border-bottom:1px solid var(--border); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(124,106,247,0.04); }
+  .rank { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:6px; font-size:0.72rem; font-weight:700; font-family:'JetBrains Mono',monospace; background:var(--surface2); color:var(--text2); }
+  .r1 { background:rgba(247,169,79,0.15); color:var(--warning); }
+  .r2 { background:rgba(232,232,240,0.1); color:var(--text); }
+  .r3 { background:rgba(76,175,130,0.1); color:var(--success); }
+  .bar-row { display:flex; align-items:center; gap:0.8rem; }
+  .mini-bar { height:4px; border-radius:100px; background:linear-gradient(90deg,var(--accent),var(--accent2)); min-width:2px; }
+  .num { font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.9rem; min-width:50px; }
+  .badge { display:inline-block; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.7rem; font-weight:500; }
+  .bm { background:rgba(124,106,247,0.15); color:var(--accent); }
+  .bc { background:rgba(79,195,247,0.15); color:var(--accent2); }
+  .export-row { display:flex; gap:0.5rem; margin-top:1.2rem; justify-content:flex-end; }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>보건의료·돌봄 <span>뉴스 수집기</span></h1>
+    <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
+</header>
+
+<div class="card">
+  <div class="section-title">수집 설정</div>
+  <div class="controls">
+    <div><label>시작일</label><input type="date" id="startDate"></div>
+    <div><label>종료일</label><input type="date" id="endDate"></div>
+    <button class="btn btn-primary" id="runBtn" onclick="startCollection()">▶ 수집 시작</button>
+    <button class="btn btn-secondary" onclick="resetAll()">초기화</button>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <span class="section-title">키워드</span>
+    <span style="font-size:0.78rem;color:var(--text2)" id="kwCount"></span>
+  </div>
+  <div class="keywords-grid" id="kwGrid"></div>
+  <div class="add-row">
+    <input type="text" id="newKw" placeholder="키워드 추가..." onkeydown="if(event.key==='Enter')addKw()">
+    <select id="newCat">
+      <option value="medical">보건의료</option>
+      <option value="care">돌봄</option>
+    </select>
+    <button class="btn btn-secondary" onclick="addKw()">+ 추가</button>
+  </div>
+</div>
+
+<div class="card progress-wrap" id="progressWrap">
+  <div class="section-title">수집 중...</div>
+  <div class="bar-bg"><div class="bar" id="bar"></div></div>
+  <div class="status" id="status">준비 중...</div>
+  <div class="log" id="log"></div>
+</div>
+
+<div class="results-wrap" id="resultsWrap">
+  <div class="results-header">
+    <span class="section-title">수집 결과</span>
+    <span style="font-size:0.78rem;color:var(--text2)" id="meta"></span>
+  </div>
+  <table>
+    <thead><tr>
+      <th style="width:50px">순위</th>
+      <th>키워드</th>
+      <th>분류</th>
+      <th>기사 건수</th>
+      <th>최근 기사</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="export-row">
+    <button class="btn btn-secondary" onclick="exportCSV()">CSV 내보내기</button>
+    <button class="btn btn-secondary" onclick="copyTable()">클립보드 복사</button>
+  </div>
+</div>
+
+<script>
+let keywords = [];
+let results = [];
+let running = false;
+
+const NAVER_ID = '7vVEt0iW5uJBlPPMcwEk';
+const NAVER_SECRET = '1MJRic3pi6';
+
+function initDates() {
+  const now = new Date();
+  const first = new Date(now.getFullYear(), now.getMonth(), 1);
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  document.getElementById('startDate').value = first.toISOString().split('T')[0];
+  document.getElementById('endDate').value = yesterday.toISOString().split('T')[0];
+}
+
+function renderKw() {
+  document.getElementById('kwGrid').innerHTML = keywords.map((k, i) => `
+    <div class="kw-tag active" id="kw${i}" onclick="toggleKw(${i})">
+      <span class="dot dot-${k.cat}"></span>${k.text}
+      <span style="margin-left:auto;color:var(--text2);font-size:0.7rem" onclick="removeKw(event,${i})">×</span>
+    </div>`).join('');
+  document.getElementById('kwCount').textContent = `${keywords.length}개`;
+}
+
+function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); }
+function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); }
+function addKw() {
+  const v = document.getElementById('newKw').value.trim();
+  const c = document.getElementById('newCat').value;
+  if (!v) return;
+  keywords.push({text:v, cat:c});
+  document.getElementById('newKw').value = '';
+  renderKw();
+}
+
+function addLog(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = type; el.textContent = msg;
+  const log = document.getElementById('log');
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function fetchNaver(keyword, startDate, endDate) {
+  const s = startDate.replace(/-/g,'');
+  const e = endDate.replace(/-/g,'');
+  // CORS 프록시 경유
+  const apiUrl = `https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(keyword)}&display=100&start=1&sort=date&startDate=${s}&endDate=${e}`;
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+  
+  try {
+    const res = await fetch(proxyUrl, {
+      headers: {
+        'X-Naver-Client-Id': NAVER_ID,
+        'X-Naver-Client-Secret': NAVER_SECRET,
+      }
+    });
+    if (!res.ok) throw new Error('API 오류: ' + res.status);
+    const data = await res.json();
+    let title = '-', source = '-';
+    if (data.items?.length > 0) {
+      title = data.items[0].title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#0*39;/g,"'");
+      try { source = new URL(data.items[0].originallink || data.items[0].link).hostname.replace('www.',''); } catch(e){}
+    }
+    return { count: data.total || 0, title, source };
+  } catch(err) {
+    console.error(err);
+    return { count: 0, title: '오류', source: '' };
+  }
+}
+
+async function startCollection() {
+  if (running) return;
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  if (!s || !e) { alert('날짜를 입력해주세요'); return; }
+
+  const active = keywords.filter((_,i) => document.getElementById('kw'+i)?.classList.contains('active'));
+  if (!active.length) { alert('키워드를 추가해주세요'); return; }
+
+  running = true; results = [];
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('log').innerHTML = '';
+
+  addLog(`수집 시작: ${s} ~ ${e}`, 'info');
+  addLog(`키워드 ${active.length}개`, 'info');
+
+  for (let i = 0; i < active.length; i++) {
+    const k = active[i];
+    document.getElementById('bar').style.width = Math.round(i/active.length*100)+'%';
+    document.getElementById('status').textContent = `[${i+1}/${active.length}] "${k.text}" 수집 중...`;
+    const r = await fetchNaver(k.text, s, e);
+    results.push({...k, ...r});
+    addLog(`✓ ${k.text}: ${r.count}건`, r.count > 0 ? 'ok' : 'info');
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('status').textContent = `완료! ${active.length}개 수집 완료`;
+  running = false;
+  document.getElementById('runBtn').disabled = false;
+
+  renderResults(s, e);
+  document.getElementById('lastRun').textContent = '마지막 수집: ' + new Date().toLocaleString('ko-KR');
+}
+
+function renderResults(s, e) {
+  const sorted = [...results].sort((a,b) => b.count - a.count);
+  const max = sorted[0]?.count || 1;
+  document.getElementById('meta').textContent = `${s} ~ ${e} · 총 ${results.reduce((a,r)=>a+r.count,0)}건`;
+  document.getElementById('tbody').innerHTML = sorted.map((r,i) => `
+    <tr>
+      <td><span class="rank ${i<3?'r'+(i+1):''}">${i+1}</span></td>
+      <td style="font-weight:500">${r.text}</td>
+      <td><span class="badge ${r.cat==='medical'?'bm':'bc'}">${r.cat==='medical'?'보건의료':'돌봄'}</span></td>
+      <td><div class="bar-row"><div class="mini-bar" style="width:${Math.max(4,r.count/max*180)}px"></div><span class="num">${r.count.toLocaleString()}</span></div></td>
+      <td style="font-size:0.78rem;color:var(--text2);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.title}">${r.source?'['+r.source+'] ':''}${r.title}</td>
+    </tr>`).join('');
+  document.getElementById('resultsWrap').classList.add('show');
+}
+
+function resetAll() {
+  results = [];
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('bar').style.width = '0%';
+}
+
+function exportCSV() {
+  if (!results.length) return;
+  const sorted = [...results].sort((a,b)=>b.count-a.count);
+  const rows = [['순위','키워드','분류','기사건수']];
+  sorted.forEach((r,i)=>rows.push([i+1,r.text,r.cat==='medical'?'보건의료':'돌봄',r.count]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = `news_${document.getElementById('startDate').value}_${document.getElementById('endDate').value}.csv`;
+  a.click();
+}
+
+function copyTable() {
+  if (!results.length) return;
+  const sorted = [...results].sort((a,b)=>b.count-a.count);
+  navigator.clipboard.writeText(sorted.map((r,i)=>`${i+1}\t${r.text}\t${r.cat==='medical'?'보건의료':'돌봄'}\t${r.count}`).join('\n'))
+    .then(()=>alert('클립보드에 복사됐습니다'));
+}
+
+initDates();
+renderKw();
+</script>
+</body>
+</html>
