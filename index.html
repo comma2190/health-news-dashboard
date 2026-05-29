@@ -85,6 +85,16 @@
   <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
 
+<div class="card" id="apiCard">
+  <div class="section-title">API 키 설정</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:end">
+    <div><label>Client ID</label><input type="password" id="naverId" placeholder="네이버 Client ID"></div>
+    <div><label>Client Secret</label><input type="password" id="naverSecret" placeholder="네이버 Client Secret"></div>
+    <button class="btn btn-secondary" onclick="saveApiKey()">저장</button>
+  </div>
+  <p style="font-size:0.72rem;color:var(--text2);margin-top:0.8rem">API 키는 이 브라우저에만 저장됩니다. 외부에 전송되지 않습니다.</p>
+</div>
+
 <div class="card">
   <div class="section-title">수집 설정</div>
   <div class="controls">
@@ -144,8 +154,8 @@ let keywords = [];
 let results = [];
 let running = false;
 
-const NAVER_ID = '7vVEt0iW5uJBlPPMcwEk';
-const NAVER_SECRET = '1MJRic3pi6';
+const NAVER_ID = localStorage.getItem('naver_id') || '';
+const NAVER_SECRET = localStorage.getItem('naver_secret') || '';
 
 function initDates() {
   const now = new Date();
@@ -185,6 +195,9 @@ function addLog(msg, type='info') {
 }
 
 async function fetchNaver(keyword, startDate, endDate) {
+  const NAVER_ID = localStorage.getItem('naver_id') || '';
+  const NAVER_SECRET = localStorage.getItem('naver_secret') || '';
+  if (!NAVER_ID || !NAVER_SECRET) { alert('API 키를 먼저 저장해주세요'); return {count:0,title:'키 없음',source:''}; }
   const s = startDate.replace(/-/g,'');
   const e = endDate.replace(/-/g,'');
   // CORS 프록시 경유
@@ -290,8 +303,26 @@ function copyTable() {
     .then(()=>alert('클립보드에 복사됐습니다'));
 }
 
+
+function saveApiKey() {
+  const id = document.getElementById('naverId').value.trim();
+  const secret = document.getElementById('naverSecret').value.trim();
+  if (!id || !secret) { alert('ID와 Secret을 모두 입력해주세요'); return; }
+  localStorage.setItem('naver_id', id);
+  localStorage.setItem('naver_secret', secret);
+  alert('저장됐습니다');
+}
+
+function loadApiKey() {
+  const id = localStorage.getItem('naver_id');
+  const secret = localStorage.getItem('naver_secret');
+  if (id) document.getElementById('naverId').value = id;
+  if (secret) document.getElementById('naverSecret').value = secret;
+}
+
 initDates();
 renderKw();
+loadApiKey();
 </script>
 </body>
 </html>
