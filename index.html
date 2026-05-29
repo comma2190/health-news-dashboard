@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XI0 뉴스 수집기</title>
+<title>X뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -148,12 +148,9 @@ const NAVER_ID = localStorage.getItem('naver_id') || '';
 const NAVER_SECRET = localStorage.getItem('naver_secret') || '';
 
 function initDates() {
-  const now = new Date();
-  const first = new Date(now.getFullYear(), now.getMonth(), 1);
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  document.getElementById('startDate').value = first.toISOString().split('T')[0];
-  document.getElementById('endDate').value = yesterday.toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('startDate').value = today;
+  document.getElementById('endDate').value = today;
 }
 
 function renderKw() {
@@ -165,8 +162,8 @@ function renderKw() {
   document.getElementById('kwCount').textContent = `${keywords.length}개`;
 }
 
-function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); }
-function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); }
+function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); saveKwToStorage(); }
+function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); saveKwToStorage(); }
 function addKw() {
   const v = document.getElementById('newKw').value.trim();
   const c = document.getElementById('newCat').value;
@@ -174,6 +171,7 @@ function addKw() {
   keywords.push({text:v, cat:c});
   document.getElementById('newKw').value = '';
   renderKw();
+  saveKwToStorage();
 }
 
 function addLog(msg, type='info') {
@@ -305,7 +303,21 @@ function copyTable() {
 }
 
 
+function saveKwToStorage() {
+  localStorage.setItem('xio_keywords', JSON.stringify(keywords));
+}
+
+function loadKwFromStorage() {
+  const saved = localStorage.getItem('xio_keywords');
+  if (saved) {
+    try {
+      keywords = JSON.parse(saved);
+    } catch(e) {}
+  }
+}
+
 initDates();
+loadKwFromStorage();
 renderKw();
 </script>
 </body>
