@@ -46,7 +46,7 @@ async function login(){
   });
 
   if(res.ok){
-    location.href='/';
+    location.href='/dashboard.html';
   }else{
     document.getElementById('msg').textContent='비밀번호가 틀렸습니다.';
   }
