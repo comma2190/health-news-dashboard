@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title> 뉴스 수집기</title>
+<title>뉴스 수집기</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -95,8 +95,8 @@
 <body>
 <header>
   <div>
-    <h1>XI0 <span>뉴스 수집기</span></h1>
-    <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
+    <h1>보건의료 <span>뉴스 수집기</span></h1>
+    <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집 - 그래프:선택일자별 언론게시량(보라) 선택일자별 검색트랜드(오렌지)</p>
   </div>
   <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
@@ -307,6 +307,60 @@ function buildDateChart(articles, startDate, endDate) {
   return { bars, peakDate, peakCount, dateCounts };
 }
 
+function buildSearchChart(datalabData) {
+  if (!datalabData?.results?.[0]?.data) return null;
+  const points = datalabData.results[0].data;
+  const dates = points.map(p => p.period.slice(5));
+  const values = points.map(p => p.ratio);
+  const maxVal = Math.max(...values, 1);
+  const peakIdx = values.indexOf(Math.max(...values));
+
+  const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
+  const n = points.length;
+  const xStep = n > 1 ? (W - padL - padR) / (n - 1) : 0;
+
+  const pts = values.map((v, i) => [padL + i * xStep, padT + (1 - v / maxVal) * (H - padT - padB)]);
+  const polyline = pts.map(([x,y]) => `${x},${y}`).join(' ');
+  const areaPath = `M${padL},${H-padB} ` + pts.map(([x,y]) => `L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H-padB} Z`;
+
+  const labelStep = Math.max(1, Math.ceil(n / 8));
+  const labels = dates.map((d, i) => {
+    if (i % labelStep !== 0 && i !== n-1) return '';
+    return `<text x="${padL+i*xStep}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d}</text>`;
+  }).join('');
+
+  const [px, py] = pts[peakIdx];
+  const peakDot = `<circle cx="${px}" cy="${py}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>
+    <text x="${px}" y="${py-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${values[peakIdx]}</text>`;
+
+  const dots = pts.map(([x,y], i) => i === peakIdx || values[i] === 0 ? '' :
+    `<circle cx="${x}" cy="${y}" r="2.5" fill="#f7a94f" opacity="0.8"/>`).join('');
+
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
+    <defs>
+      <linearGradient id="searchGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f7a94f" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaPath}" fill="url(#searchGrad)"/>
+    <polyline points="${polyline}" fill="none" stroke="#f7a94f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${peakDot}${labels}
+  </svg>`;
+}
+
+async function fetchDatalab(keyword, startDate, endDate) {
+  try {
+    const res = await fetch(`https://news-api-three.vercel.app/api/datalab?keyword=${encodeURIComponent(keyword)}&startDate=${startDate}&endDate=${endDate}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data;
+  } catch(e) {
+    console.error('Datalab error:', e);
+    return null;
+  }
+}
+
 async function startCollection() {
   if (running) return;
   const s = document.getElementById('startDate').value;
@@ -332,8 +386,10 @@ async function startCollection() {
     
     const articles = await fetchNaver(k.text, s, e);
     const { bars, peakDate, peakCount, dateCounts } = buildDateChart(articles, s, e);
-    
-    results.push({ ...k, count: articles.length, articles, bars, peakDate, peakCount, dateCounts });
+    const datalabData = await fetchDatalab(k.text, s, e);
+    const searchBars = datalabData ? buildSearchChart(datalabData) : null;
+
+    results.push({ ...k, count: articles.length, articles, bars, peakDate, peakCount, dateCounts, searchBars });
     addLog(`✓ ${k.text}: ${articles.length}건 (피크: ${peakDate} ${peakCount}건)`, articles.length > 0 ? 'ok' : 'info');
     await new Promise(r => setTimeout(r, 200));
   }
@@ -363,8 +419,12 @@ function renderResults(s, e) {
       </div>
       ${r.count > 0 ? `
       <div class="chart-wrap">
-        <div class="chart-title">날짜별 기사 건수</div>
-        <div class="chart">${r.bars}</div>
+        <div class="chart-title" style="display:flex;gap:1.5rem">
+          <span style="color:#7c6af7">● 뉴스 보도량</span>
+          ${r.searchBars ? '<span style="color:#f7a94f">● 검색량 트렌드</span>' : ''}
+        </div>
+        <div style="margin-bottom:0.3rem"><div class="chart">${r.bars}</div></div>
+        ${r.searchBars ? `<div style="margin-top:0.5rem"><div class="chart">${r.searchBars}</div></div>` : ''}
       </div>` : ''}
       <div class="articles-wrap" id="card${i}">
         ${r.articles.length > 0 ? r.articles.map((a, j) => `
