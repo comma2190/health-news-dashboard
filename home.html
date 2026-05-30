@@ -227,7 +227,7 @@ async function generateBriefing() {
     var promptText = '보건의료복지 분야 전문 분석가입니다. "' + item.text + '" 키워드 뉴스를 분석해 브리핑을 작성하세요.\n기사:\n' + articleLines + '\n아래 JSON만 출력하세요:\n{"tag":"긴급 또는 주목 또는 동향","summary":"3문장 이상 요약","refs":[{"title":"제목","url":"주소"},{"title":"제목","url":"주소"},{"title":"제목","url":"주소"}],"beneficiary":"수혜자 관점 2문장","civic":"시민단체 관점 2문장"}';
 
     try {
-      var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
+      var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({contents: [{parts: [{text: promptText}]}]})
