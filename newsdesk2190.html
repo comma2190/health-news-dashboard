@@ -424,7 +424,7 @@ function buildCombinedChart(articles, startDate, endDate, datalabData) {
   const xStep = n > 1 ? (W - padL - padR) / (n-1) : 0;
 
   // 뉴스 차트 포인트
-  const nPts = newsCounts.map((c,i) => [padL + i*xStep, 8 + (1 - c/newsMax)*(H1-16)]);
+  const nPts = newsCounts.map((c,i) => [padL + i*xStep, 28 + (1 - c/newsMax)*(H1-36)]);
   const nLine = nPts.map(([x,y])=>`${x},${y}`).join(' ');
   const nArea = `M${padL},${H1} ` + nPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H1} Z`;
   const [npx,npy] = nPts[newsPeakIdx];
