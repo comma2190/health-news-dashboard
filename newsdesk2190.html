@@ -59,7 +59,8 @@ input:focus, select:focus { border-color:var(--accent); }
 .toggle-icon { color:var(--text2); font-size:0.8rem; transition:transform 0.2s; }
 .toggle-icon.open { transform:rotate(180deg); }
 .chart-wrap { padding:0.8rem 1rem; border-top:1px solid var(--border); background:var(--surface2); overflow:hidden; }
-.chart-title { font-size:0.72rem; color:var(--text2); margin-bottom:0.8rem; }
+.chart-title { font-size:0.72rem; color:var(--text2); margin-bottom:0.4rem; }
+.chart-combined { padding:0.8rem 1rem; border-top:1px solid var(--border); background:var(--surface2); overflow:hidden; }
 .articles-wrap { display:none; border-top:1px solid var(--border); }
 .articles-wrap.show { display:block; }
 .article-item { display:flex; align-items:flex-start; gap:0.8rem; padding:0.75rem 1rem; border-bottom:1px solid var(--border); transition:background 0.15s; }
@@ -350,7 +351,7 @@ function buildDateChart(articles, startDate, endDate) {
   const [px, py] = pts[peakIdx];
   const peakDot = peakCount > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${peakCount}건</text>` : '';
   const dots = pts.map(([x,y], i) => i === peakIdx || counts[i] === 0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.8"/>`).join('');
-  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="height:80px;max-width:100%">
+  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:75px;display:block">
 <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#areaGrad)"/>
 <polyline points="${polyline}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
@@ -380,7 +381,7 @@ function buildSearchChart(datalabData) {
   const [px, py] = pts[peakIdx];
   const peakDate = points[peakIdx].period.slice(5);
   const peakDot = values[peakIdx] > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${peakDate}</text>` : '';
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:80px;overflow:hidden">
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:75px;display:block;overflow:hidden">
 <defs><linearGradient id="searchGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#searchGrad)"/>
 <path d="${linePath}" fill="none" stroke="#f7a94f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -394,6 +395,88 @@ async function fetchDatalab(keyword, startDate, endDate) {
     if (!res.ok) return null;
     return await res.json();
   } catch(e) { return null; }
+}
+
+function buildCombinedChart(articles, startDate, endDate, datalabData) {
+  // 날짜별 뉴스 건수
+  const dateCounts = {};
+  const start = new Date(startDate), end = new Date(endDate);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1))
+    dateCounts[d.toISOString().split('T')[0]] = 0;
+  articles.forEach(a => { if (dateCounts[a.dateStr] !== undefined) dateCounts[a.dateStr]++; });
+  const dates = Object.keys(dateCounts).sort();
+  const newsCounts = dates.map(d => dateCounts[d]);
+  const newsMax = Math.max(...newsCounts, 1);
+  const newsPeakIdx = newsCounts.indexOf(Math.max(...newsCounts));
+
+  // 검색트렌드
+  const hasSearch = datalabData?.results?.[0]?.data;
+  let searchPts = [];
+  if (hasSearch) {
+    const pts = datalabData.results[0].data;
+    const maxV = Math.max(...pts.map(p=>p.ratio), 1);
+    searchPts = pts.map(p => ({ date: p.period.split('T')[0], ratio: p.ratio/maxV }));
+  }
+
+  const W = 800, padL = 10, padR = 10;
+  const H1 = 70, H2 = 70, gap = 24, totalH = H1 + gap + H2 + 20;
+  const n = dates.length;
+  const xStep = n > 1 ? (W - padL - padR) / (n-1) : 0;
+
+  // 뉴스 차트 포인트
+  const nPts = newsCounts.map((c,i) => [padL + i*xStep, 8 + (1 - c/newsMax)*(H1-16)]);
+  const nLine = nPts.map(([x,y])=>`${x},${y}`).join(' ');
+  const nArea = `M${padL},${H1} ` + nPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H1} Z`;
+  const [npx,npy] = nPts[newsPeakIdx];
+  const nPeak = newsCounts[newsPeakIdx] > 0 ? `<circle cx="${npx}" cy="${npy}" r="4" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${npx}" y="${npy-8}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[newsPeakIdx]}건</text>` : '';
+  const nDots = nPts.map(([x,y],i) => i===newsPeakIdx||newsCounts[i]===0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.7"/>`).join('');
+
+  // 검색트렌드 차트 포인트 (x축을 뉴스 날짜 기준으로 맞춤)
+  let sLine = '', sArea = '', sPeak = '';
+  const sy = H1 + gap;
+  if (searchPts.length > 1) {
+    const sPtsMapped = dates.map((d,i) => {
+      const found = searchPts.find(p => p.date === d);
+      const ratio = found ? found.ratio : null;
+      return { x: padL + i*xStep, ratio };
+    });
+    const validPts = sPtsMapped.filter(p => p.ratio !== null);
+    if (validPts.length > 1) {
+      const sCoords = validPts.map(p => [p.x, sy + 8 + (1-p.ratio)*(H2-16)]);
+      sLine = sCoords.map(([x,y])=>`${x},${y}`).join(' ');
+      sArea = `M${sCoords[0][0]},${sy+H2} ` + sCoords.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${sCoords[sCoords.length-1][0]},${sy+H2} Z`;
+      const sMaxIdx = sCoords.indexOf(sCoords.reduce((a,b)=>a[1]<b[1]?a:b));
+      const [spx,spy] = sCoords[sMaxIdx];
+      sPeak = `<circle cx="${spx}" cy="${spy}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>`;
+    }
+  }
+
+  // x축 라벨 (공유)
+  const labelStep = Math.max(1, Math.ceil(n/7));
+  const xLabels = dates.map((d,i) => {
+    if (i % labelStep !== 0 && i !== n-1) return '';
+    return `<text x="${padL + i*xStep}" y="${totalH}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
+  }).join('');
+
+  // 구분선
+  const divLine = `<line x1="${padL}" y1="${H1+gap/2}" x2="${W-padR}" y2="${H1+gap/2}" stroke="#2a2a38" stroke-width="0.5"/>`;
+
+  const svg = `<svg viewBox="0 0 ${W} ${totalH+4}" preserveAspectRatio="none" style="width:100%;height:${Math.round((totalH+4)*0.22)}px;display:block;overflow:visible">
+<defs>
+<linearGradient id="ng" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient>
+<linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient>
+</defs>
+<path d="${nArea}" fill="url(#ng)"/>
+<polyline points="${nLine}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+${nDots}${nPeak}
+${divLine}
+${sArea ? `<path d="${sArea}" fill="url(#sg)"/>` : ''}
+${sLine ? `<polyline points="${sLine}" fill="none" stroke="#f7a94f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : ''}
+${sPeak}
+${xLabels}
+</svg>`;
+
+  return { svg, peakDate: dates[newsPeakIdx], peakCount: newsCounts[newsPeakIdx], dateCounts };
 }
 
 async function startCollection() {
@@ -415,10 +498,9 @@ async function startCollection() {
     document.getElementById('bar').style.width = Math.round(i/active.length*100)+'%';
     document.getElementById('status').textContent = `[${i+1}/${active.length}] "${k.text}" 수집 중...`;
     const articles = await fetchNaver(k.text, s, e, addLog);
-    const { bars, peakDate, peakCount, dateCounts } = buildDateChart(articles, s, e);
     const datalabData = await fetchDatalab(k.text, s, e);
-    const searchBars = datalabData ? buildSearchChart(datalabData) : null;
-    results.push({ ...k, count: articles.length, articles, bars, peakDate, peakCount, dateCounts, searchBars });
+    const { svg: combinedSvg, peakDate, peakCount, dateCounts } = buildCombinedChart(articles, s, e, datalabData);
+    results.push({ ...k, count: articles.length, articles, combinedSvg, peakDate, peakCount, dateCounts });
     addLog(`✓ ${k.text}: ${articles.length}건 (피크: ${peakDate} ${peakCount}건)`, articles.length > 0 ? 'ok' : 'info');
     await new Promise(r => setTimeout(r, 200));
   }
@@ -442,15 +524,14 @@ function renderResults(s, e) {
 ${r.peakCount > 0 ? `<span class="result-peak">📈 ${r.peakDate} (${r.peakCount}건)</span>` : ''}
 <span class="toggle-icon" id="icon${i}">▼</span>
 </div>
-${r.count > 0 ? `
-<div class="chart-wrap">
-<div class="chart-title" style="color:#7c6af7;margin-bottom:0.5rem">● 뉴스 보도량</div>
-<div>${r.bars}</div>
+${r.count > 0 && r.combinedSvg ? `
+<div class="chart-combined">
+<div style="display:flex;gap:1rem;margin-bottom:0.5rem">
+<span class="chart-title" style="color:#7c6af7">● 뉴스 보도량</span>
+<span class="chart-title" style="color:#f7a94f">● 검색트렌드</span>
 </div>
-${r.searchBars ? `<div class="chart-wrap" style="border-top:1px solid var(--border)">
-<div class="chart-title" style="color:#f7a94f;margin-bottom:0.5rem">● 검색량 트렌드</div>
-<div>${r.searchBars}</div>
-</div>` : ''}` : ''}
+${r.combinedSvg}
+</div>` : ''}
 <div class="articles-wrap" id="card${i}">
 ${r.articles.length > 0 ? r.articles.map((a, j) => `
 <div class="article-item">
