@@ -14,9 +14,10 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding:1.2rem; }
-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2rem; padding-bottom:1.2rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.5rem; }
+header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; padding-bottom:1.2rem; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:0.5rem; }
 h1 { font-size:1.3rem; font-weight:700; letter-spacing:-0.02em; }
 h1 span { color:var(--accent); }
+h1 .secret-trigger { cursor:default; user-select:none; -webkit-user-select:none; }
 .subtitle { font-size:0.78rem; color:var(--text2); margin-top:0.3rem; }
 .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin-bottom:1.2rem; }
 .section-title { font-size:0.75rem; font-weight:600; color:var(--text2); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
@@ -49,7 +50,6 @@ input:focus, select:focus { border-color:var(--accent); }
 .status { font-size:0.8rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
 .log { background:var(--surface2); border-radius:8px; padding:0.8rem; margin-top:0.8rem; max-height:140px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.8; }
 .ok { color:var(--success); } .err { color:var(--error); } .info { color:var(--text2); }
-
 .result-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:1rem; overflow:hidden; }
 .result-header { display:flex; align-items:center; gap:0.7rem; padding:1rem 1rem; cursor:pointer; transition:background 0.15s; flex-wrap:wrap; }
 .result-header:hover { background:rgba(124,106,247,0.05); }
@@ -58,11 +58,8 @@ input:focus, select:focus { border-color:var(--accent); }
 .result-peak { font-size:0.72rem; color:var(--text2); }
 .toggle-icon { color:var(--text2); font-size:0.8rem; transition:transform 0.2s; }
 .toggle-icon.open { transform:rotate(180deg); }
-
 .chart-wrap { padding:0.8rem 1rem; border-top:1px solid var(--border); background:var(--surface2); }
 .chart-title { font-size:0.72rem; color:var(--text2); margin-bottom:0.8rem; }
-.chart-svg { width:100%; overflow:visible; }
-
 .articles-wrap { display:none; border-top:1px solid var(--border); }
 .articles-wrap.show { display:block; }
 .article-item { display:flex; align-items:flex-start; gap:0.8rem; padding:0.75rem 1rem; border-bottom:1px solid var(--border); transition:background 0.15s; }
@@ -74,16 +71,48 @@ input:focus, select:focus { border-color:var(--accent); }
 .article-title a { color:var(--text); text-decoration:none; }
 .article-title a:hover { color:var(--accent); }
 .article-meta { font-size:0.72rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
-
 .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
 .export-row { display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap; }
 .export-row .btn { flex:1; min-width:120px; }
 .results-wrap { display:none; }
 .results-wrap.show { display:block; }
+
+/* 탭 */
+.tab-bar { display:none; gap:0.5rem; margin-bottom:1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.4rem; }
+.tab-bar.show { display:flex; }
+.tab-btn { flex:1; padding:0.6rem; border-radius:8px; border:none; background:transparent; color:var(--text2); font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; }
+.tab-btn.active { background:var(--accent); color:white; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* 브리핑 */
+.brief-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:1.2rem; overflow:hidden; }
+.brief-header { padding:1.2rem; border-bottom:1px solid var(--border); }
+.brief-kw { font-size:1rem; font-weight:700; margin-bottom:0.4rem; }
+.brief-tag { display:inline-block; font-size:0.7rem; font-weight:600; padding:0.2rem 0.6rem; border-radius:100px; margin-bottom:0.8rem; }
+.tag-urgent { background:rgba(247,106,106,0.15); color:#f76a6a; border:1px solid rgba(247,106,106,0.3); }
+.tag-watch { background:rgba(247,169,79,0.15); color:#f7a94f; border:1px solid rgba(247,169,79,0.3); }
+.tag-trend { background:rgba(124,106,247,0.15); color:#7c6af7; border:1px solid rgba(124,106,247,0.3); }
+.brief-summary { font-size:0.88rem; line-height:1.8; color:var(--text); margin-bottom:1rem; word-break:keep-all; }
+.brief-refs { margin-bottom:0; }
+.brief-ref-title { font-size:0.7rem; color:var(--text2); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.5rem; }
+.brief-ref-item { font-size:0.8rem; padding:0.3rem 0; }
+.brief-ref-item a { color:var(--accent2); text-decoration:none; }
+.brief-ref-item a:hover { text-decoration:underline; }
+.brief-body { padding:1.2rem; display:flex; flex-direction:column; gap:1rem; }
+.brief-perspective { background:var(--surface2); border-radius:8px; padding:1rem; }
+.brief-persp-label { font-size:0.7rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:0.6rem; }
+.label-beneficiary { color:#4fc3f7; }
+.label-civic { color:#4caf82; }
+.brief-persp-text { font-size:0.86rem; line-height:1.8; word-break:keep-all; }
+.brief-loading { padding:2rem; text-align:center; color:var(--text2); font-size:0.85rem; }
+.brief-actions { display:flex; gap:0.5rem; padding:1rem 1.2rem; border-top:1px solid var(--border); flex-wrap:wrap; }
+.brief-actions .btn { flex:1; min-width:100px; font-size:0.8rem; padding:0.5rem 0.8rem; }
+.copy-all-btn { margin-bottom:1rem; width:100%; }
+
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
-
 @media (max-width: 480px) {
   body { padding:0.8rem; }
   h1 { font-size:1.1rem; }
@@ -98,13 +127,20 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <body>
 <header>
 <div>
-<h1>보건의료 <span>뉴스 수집기</span></h1>
+<h1><span class="secret-trigger" id="secretTrigger">보건의료</span> <span>뉴스 수집기</span></h1>
 <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
 <p class="subtitle">그래프: <span style="color:#7c6af7">언론게시량(보라)</span> <span style="color:#f7a94f">검색트렌드(오렌지)</span></p>
 </div>
 <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
 
+<div class="tab-bar" id="tabBar">
+<button class="tab-btn active" onclick="switchTab('collect')">수집</button>
+<button class="tab-btn" onclick="switchTab('brief')">브리핑</button>
+</div>
+
+<!-- 수집 탭 -->
+<div class="tab-content active" id="tab-collect">
 <div class="card">
 <div class="section-title">수집 설정</div>
 <div class="controls">
@@ -147,188 +183,204 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <button class="btn btn-secondary" onclick="copyTable()">클립보드 복사</button>
 </div>
 </div>
+</div>
+
+<!-- 브리핑 탭 -->
+<div class="tab-content" id="tab-brief">
+<div class="card" style="margin-bottom:1.2rem">
+<div class="section-title">브리핑 생성</div>
+<p style="font-size:0.83rem;color:var(--text2);margin-bottom:1rem;line-height:1.6">수집된 키워드별 뉴스를 분석해 요약 및 관점 해석을 생성합니다.</p>
+<button class="btn btn-primary" id="briefBtn" onclick="generateBriefing()" style="width:100%">▶ 브리핑 생성</button>
+</div>
+<div id="briefCards"></div>
+</div>
 
 <script>
 let keywords = [];
 let results = [];
 let running = false;
+let briefUnlocked = false;
+let holdTimer = null;
 
 const API_BASE = 'https://news-api-three.vercel.app/api/naver';
 
+// 비밀 트리거 — 보건의료 5초 길게 누르기
+const trigger = document.getElementById('secretTrigger');
+trigger.addEventListener('mousedown', startHold);
+trigger.addEventListener('touchstart', startHold, {passive:true});
+trigger.addEventListener('mouseup', cancelHold);
+trigger.addEventListener('mouseleave', cancelHold);
+trigger.addEventListener('touchend', cancelHold);
+
+function startHold(e) {
+  holdTimer = setTimeout(() => {
+    briefUnlocked = true;
+    document.getElementById('tabBar').classList.add('show');
+  }, 5000);
+}
+function cancelHold() {
+  clearTimeout(holdTimer);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
 function initDates() {
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('startDate').value = today;
-document.getElementById('endDate').value = today;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('startDate').value = today;
+  document.getElementById('endDate').value = today;
 }
 
 function renderKw() {
-document.getElementById('kwGrid').innerHTML = keywords.map((k, i) => `
-<div class="kw-tag active" id="kw${i}" onclick="toggleKw(${i})">
-${k.text}
-<span style="margin-left:auto;color:var(--text2);font-size:0.7rem" onclick="removeKw(event,${i})">×</span>
-</div>`).join('');
-document.getElementById('kwCount').textContent = `${keywords.length}개`;
+  document.getElementById('kwGrid').innerHTML = keywords.map((k, i) => `
+  <div class="kw-tag active" id="kw${i}" onclick="toggleKw(${i})">
+    ${k.text}
+    <span style="margin-left:auto;color:var(--text2);font-size:0.7rem" onclick="removeKw(event,${i})">×</span>
+  </div>`).join('');
+  document.getElementById('kwCount').textContent = `${keywords.length}개`;
 }
 
 function toggleKw(i) { document.getElementById('kw'+i).classList.toggle('active'); }
 function removeKw(e, i) { e.stopPropagation(); keywords.splice(i,1); renderKw(); }
 function addKw() {
-const v = document.getElementById('newKw').value.trim();
-if (!v) return;
-keywords.push({text:v});
-document.getElementById('newKw').value = '';
-renderKw();
+  const v = document.getElementById('newKw').value.trim();
+  if (!v) return;
+  keywords.push({text:v});
+  document.getElementById('newKw').value = '';
+  renderKw();
 }
 
 function addLog(msg, type='info') {
-const el = document.createElement('div');
-el.className = type; el.textContent = msg;
-const log = document.getElementById('log');
-log.appendChild(el);
-log.scrollTop = log.scrollHeight;
+  const el = document.createElement('div');
+  el.className = type; el.textContent = msg;
+  const log = document.getElementById('log');
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
 }
 
-// 날짜 범위를 5일씩 분할
 function splitDateRange(startDate, endDate) {
-const ranges = [];
-let cur = new Date(startDate);
-const end = new Date(endDate);
-while (cur <= end) {
-const from = cur.toISOString().split('T')[0];
-const to = new Date(Math.min(cur.getTime() + 4 * 86400000, end.getTime())).toISOString().split('T')[0];
-ranges.push({ from, to });
-cur = new Date(cur.getTime() + 5 * 86400000);
-}
-return ranges;
+  const ranges = [];
+  let cur = new Date(startDate);
+  const end = new Date(endDate);
+  while (cur <= end) {
+    const from = cur.toISOString().split('T')[0];
+    const to = new Date(Math.min(cur.getTime() + 4 * 86400000, end.getTime())).toISOString().split('T')[0];
+    ranges.push({ from, to });
+    cur = new Date(cur.getTime() + 5 * 86400000);
+  }
+  return ranges;
 }
 
 async function fetchNaverChunk(keyword, startDate, endDate) {
-const startMs = new Date(startDate).getTime();
-const endMs = new Date(endDate + 'T23:59:59').getTime();
-let articles = [];
-let startIdx = 1;
-let reachedEnd = false;
-
-while (!reachedEnd && startIdx <= 1000) {
-try {
-const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent(keyword)}&start=${startIdx}`);
-if (!res.ok) break;
-const data = await res.json();
-if (!data.items || data.items.length === 0) break;
-
-for (const item of data.items) {
-const pubMs = new Date(item.pubDate).getTime();
-if (pubMs > endMs) continue;
-if (pubMs < startMs) { reachedEnd = true; break; }
-articles.push({
-title: item.title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#0*39;/g,"'"),
-link: item.originallink || item.link,
-pubDate: item.pubDate,
-dateStr: new Date(item.pubDate).toISOString().split('T')[0],
-});
-}
-if (data.items.length < 100) break;
-startIdx += 100;
-await new Promise(r => setTimeout(r, 200));
-} catch(err) { console.error(err); break; }
-}
-return articles;
+  const startMs = new Date(startDate).getTime();
+  const endMs = new Date(endDate + 'T23:59:59').getTime();
+  let articles = [];
+  let startIdx = 1;
+  let reachedEnd = false;
+  while (!reachedEnd && startIdx <= 1000) {
+    try {
+      const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent(keyword)}&start=${startIdx}`);
+      if (!res.ok) break;
+      const data = await res.json();
+      if (!data.items || data.items.length === 0) break;
+      for (const item of data.items) {
+        const pubMs = new Date(item.pubDate).getTime();
+        if (pubMs > endMs) continue;
+        if (pubMs < startMs) { reachedEnd = true; break; }
+        articles.push({
+          title: item.title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#0*39;/g,"'"),
+          link: item.originallink || item.link,
+          pubDate: item.pubDate,
+          dateStr: new Date(item.pubDate).toISOString().split('T')[0],
+        });
+      }
+      if (data.items.length < 100) break;
+      startIdx += 100;
+      await new Promise(r => setTimeout(r, 200));
+    } catch(err) { console.error(err); break; }
+  }
+  return articles;
 }
 
 async function fetchNaver(keyword, startDate, endDate, logFn) {
-const ranges = splitDateRange(startDate, endDate);
-let allArticles = [];
-const seen = new Set();
-
-for (let i = 0; i < ranges.length; i++) {
-const { from, to } = ranges[i];
-if (logFn) logFn(`  └ ${from} ~ ${to} 수집 중... (${i+1}/${ranges.length})`, 'info');
-const chunk = await fetchNaverChunk(keyword, from, to);
-for (const a of chunk) {
-if (!seen.has(a.link)) { seen.add(a.link); allArticles.push(a); }
-}
-await new Promise(r => setTimeout(r, 150));
-}
-return allArticles;
+  const ranges = splitDateRange(startDate, endDate);
+  let allArticles = [];
+  const seen = new Set();
+  for (let i = 0; i < ranges.length; i++) {
+    const { from, to } = ranges[i];
+    if (logFn) logFn(`  └ ${from} ~ ${to} (${i+1}/${ranges.length})`, 'info');
+    const chunk = await fetchNaverChunk(keyword, from, to);
+    for (const a of chunk) {
+      if (!seen.has(a.link)) { seen.add(a.link); allArticles.push(a); }
+    }
+    await new Promise(r => setTimeout(r, 150));
+  }
+  return allArticles;
 }
 
 function buildDateChart(articles, startDate, endDate) {
-const dateCounts = {};
-const start = new Date(startDate);
-const end = new Date(endDate);
-
-for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
-dateCounts[d.toISOString().split('T')[0]] = 0;
-}
-articles.forEach(a => { if (dateCounts[a.dateStr] !== undefined) dateCounts[a.dateStr]++; });
-
-const dates = Object.keys(dateCounts).sort();
-const counts = dates.map(d => dateCounts[d]);
-const maxCount = Math.max(...counts, 1);
-const peakIdx = counts.indexOf(Math.max(...counts));
-const peakDate = dates[peakIdx];
-const peakCount = counts[peakIdx];
-
-const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
-const n = dates.length;
-const xStep = n > 1 ? (W - padL - padR) / (n - 1) : 0;
-
-const pts = counts.map((c, i) => [padL + i * xStep, padT + (1 - c / maxCount) * (H - padT - padB)]);
-const polyline = pts.map(([x,y]) => `${x},${y}`).join(' ');
-const areaPath = `M${padL},${H-padB} ` + pts.map(([x,y]) => `L${x},${y}`).join(' ') + ` L${padL + (n-1)*xStep},${H-padB} Z`;
-
-const labelStep = Math.max(1, Math.ceil(n / 8));
-const labels = dates.map((d, i) => {
-if (i % labelStep !== 0 && i !== n-1) return '';
-return `<text x="${padL + i * xStep}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
-}).join('');
-
-const [px, py] = pts[peakIdx];
-const peakDot = peakCount > 0
-? `<circle cx="${px}" cy="${py}" r="5" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${peakCount}건</text>`
-: '';
-
-const dots = pts.map(([x,y], i) => i === peakIdx || counts[i] === 0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.8"/>`).join('');
-
-const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
+  const dateCounts = {};
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+    dateCounts[d.toISOString().split('T')[0]] = 0;
+  }
+  articles.forEach(a => { if (dateCounts[a.dateStr] !== undefined) dateCounts[a.dateStr]++; });
+  const dates = Object.keys(dateCounts).sort();
+  const counts = dates.map(d => dateCounts[d]);
+  const maxCount = Math.max(...counts, 1);
+  const peakIdx = counts.indexOf(Math.max(...counts));
+  const peakDate = dates[peakIdx];
+  const peakCount = counts[peakIdx];
+  const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
+  const n = dates.length;
+  const xStep = n > 1 ? (W - padL - padR) / (n - 1) : 0;
+  const pts = counts.map((c, i) => [padL + i * xStep, padT + (1 - c / maxCount) * (H - padT - padB)]);
+  const polyline = pts.map(([x,y]) => `${x},${y}`).join(' ');
+  const areaPath = `M${padL},${H-padB} ` + pts.map(([x,y]) => `L${x},${y}`).join(' ') + ` L${padL + (n-1)*xStep},${H-padB} Z`;
+  const labelStep = Math.max(1, Math.ceil(n / 8));
+  const labels = dates.map((d, i) => {
+    if (i % labelStep !== 0 && i !== n-1) return '';
+    return `<text x="${padL + i * xStep}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
+  }).join('');
+  const [px, py] = pts[peakIdx];
+  const peakDot = peakCount > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${peakCount}건</text>` : '';
+  const dots = pts.map(([x,y], i) => i === peakIdx || counts[i] === 0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.8"/>`).join('');
+  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
 <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#areaGrad)"/>
 <polyline points="${polyline}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 ${dots}${peakDot}${labels}
 </svg>`;
-
-return { bars, peakDate, peakCount, dateCounts };
+  return { bars, peakDate, peakCount, dateCounts };
 }
 
 function buildSearchChart(datalabData) {
-if (!datalabData?.results?.[0]?.data) return null;
-const points = datalabData.results[0].data;
-const values = points.map(p => p.ratio);
-const maxVal = Math.max(...values, 1);
-const peakIdx = values.indexOf(Math.max(...values));
-
-const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
-const n = points.length;
-if (n < 2) return null;
-const xStep = (W - padL - padR) / (n - 1);
-
-const pts = values.map((v, i) => [padL + i * xStep, padT + (1 - v / maxVal) * (H - padT - padB)]);
-const linePath = 'M' + pts.map(([x,y]) => `${x},${y}`).join(' L');
-const areaPath = `M${padL},${H-padB} L` + pts.map(([x,y]) => `${x},${y}`).join(' L') + ` L${pts[n-1][0]},${H-padB} Z`;
-
-const labelStep = Math.max(1, Math.ceil(n / 8));
-const labels = points.map((p, i) => {
-if (i % labelStep !== 0 && i !== n-1) return '';
-return `<text x="${pts[i][0]}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${p.period.slice(5)}</text>`;
-}).join('');
-
-const [px, py] = pts[peakIdx];
-const peakDate = points[peakIdx].period.slice(5);
-const peakDot = values[peakIdx] > 0
-? `<circle cx="${px}" cy="${py}" r="5" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${peakDate}</text>`
-: '';
-
-return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:90px;overflow:visible">
+  if (!datalabData?.results?.[0]?.data) return null;
+  const points = datalabData.results[0].data;
+  const values = points.map(p => p.ratio);
+  const maxVal = Math.max(...values, 1);
+  const peakIdx = values.indexOf(Math.max(...values));
+  const W = 800, H = 80, padL = 8, padR = 8, padT = 8, padB = 20;
+  const n = points.length;
+  if (n < 2) return null;
+  const xStep = (W - padL - padR) / (n - 1);
+  const pts = values.map((v, i) => [padL + i * xStep, padT + (1 - v / maxVal) * (H - padT - padB)]);
+  const linePath = 'M' + pts.map(([x,y]) => `${x},${y}`).join(' L');
+  const areaPath = `M${padL},${H-padB} L` + pts.map(([x,y]) => `${x},${y}`).join(' L') + ` L${pts[n-1][0]},${H-padB} Z`;
+  const labelStep = Math.max(1, Math.ceil(n / 8));
+  const labels = points.map((p, i) => {
+    if (i % labelStep !== 0 && i !== n-1) return '';
+    return `<text x="${pts[i][0]}" y="${H}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${p.period.slice(5)}</text>`;
+  }).join('');
+  const [px, py] = pts[peakIdx];
+  const peakDate = points[peakIdx].period.slice(5);
+  const peakDot = values[peakIdx] > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${peakDate}</text>` : '';
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:90px;overflow:visible">
 <defs><linearGradient id="searchGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#searchGrad)"/>
 <path d="${linePath}" fill="none" stroke="#f7a94f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -337,60 +389,51 @@ ${peakDot}${labels}
 }
 
 async function fetchDatalab(keyword, startDate, endDate) {
-try {
-const res = await fetch(`https://news-api-three.vercel.app/api/datalab?keyword=${encodeURIComponent(keyword)}&startDate=${startDate}&endDate=${endDate}`);
-if (!res.ok) return null;
-return await res.json();
-} catch(e) { return null; }
+  try {
+    const res = await fetch(`https://news-api-three.vercel.app/api/datalab?keyword=${encodeURIComponent(keyword)}&startDate=${startDate}&endDate=${endDate}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
 }
 
 async function startCollection() {
-if (running) return;
-const s = document.getElementById('startDate').value;
-const e = document.getElementById('endDate').value;
-if (!s || !e) { alert('날짜를 입력해주세요'); return; }
-
-const active = keywords.filter((_,i) => document.getElementById('kw'+i)?.classList.contains('active'));
-if (!active.length) { alert('키워드를 추가해주세요'); return; }
-
-running = true; results = [];
-document.getElementById('runBtn').disabled = true;
-document.getElementById('progressWrap').classList.add('show');
-document.getElementById('resultsWrap').classList.remove('show');
-document.getElementById('log').innerHTML = '';
-
-addLog(`수집 시작: ${s} ~ ${e}`, 'info');
-addLog(`키워드 ${active.length}개`, 'info');
-
-for (let i = 0; i < active.length; i++) {
-const k = active[i];
-document.getElementById('bar').style.width = Math.round(i/active.length*100)+'%';
-document.getElementById('status').textContent = `[${i+1}/${active.length}] "${k.text}" 수집 중...`;
-
-const articles = await fetchNaver(k.text, s, e, addLog);
-const { bars, peakDate, peakCount, dateCounts } = buildDateChart(articles, s, e);
-const datalabData = await fetchDatalab(k.text, s, e);
-const searchBars = datalabData ? buildSearchChart(datalabData) : null;
-
-results.push({ ...k, count: articles.length, articles, bars, peakDate, peakCount, dateCounts, searchBars });
-addLog(`✓ ${k.text}: ${articles.length}건 (피크: ${peakDate} ${peakCount}건)`, articles.length > 0 ? 'ok' : 'info');
-await new Promise(r => setTimeout(r, 200));
-}
-
-document.getElementById('bar').style.width = '100%';
-document.getElementById('status').textContent = `완료! ${active.length}개 수집 완료`;
-running = false;
-document.getElementById('runBtn').disabled = false;
-
-renderResults(s, e);
-document.getElementById('lastRun').textContent = '마지막 수집: ' + new Date().toLocaleString('ko-KR');
+  if (running) return;
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  if (!s || !e) { alert('날짜를 입력해주세요'); return; }
+  const active = keywords.filter((_,i) => document.getElementById('kw'+i)?.classList.contains('active'));
+  if (!active.length) { alert('키워드를 추가해주세요'); return; }
+  running = true; results = [];
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('log').innerHTML = '';
+  addLog(`수집 시작: ${s} ~ ${e}`, 'info');
+  addLog(`키워드 ${active.length}개`, 'info');
+  for (let i = 0; i < active.length; i++) {
+    const k = active[i];
+    document.getElementById('bar').style.width = Math.round(i/active.length*100)+'%';
+    document.getElementById('status').textContent = `[${i+1}/${active.length}] "${k.text}" 수집 중...`;
+    const articles = await fetchNaver(k.text, s, e, addLog);
+    const { bars, peakDate, peakCount, dateCounts } = buildDateChart(articles, s, e);
+    const datalabData = await fetchDatalab(k.text, s, e);
+    const searchBars = datalabData ? buildSearchChart(datalabData) : null;
+    results.push({ ...k, count: articles.length, articles, bars, peakDate, peakCount, dateCounts, searchBars });
+    addLog(`✓ ${k.text}: ${articles.length}건 (피크: ${peakDate} ${peakCount}건)`, articles.length > 0 ? 'ok' : 'info');
+    await new Promise(r => setTimeout(r, 200));
+  }
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('status').textContent = `완료! ${active.length}개 수집 완료`;
+  running = false;
+  document.getElementById('runBtn').disabled = false;
+  renderResults(s, e);
+  document.getElementById('lastRun').textContent = '마지막 수집: ' + new Date().toLocaleString('ko-KR');
 }
 
 function renderResults(s, e) {
-const sorted = [...results].sort((a,b) => b.count - a.count);
-document.getElementById('meta').textContent = `${s} ~ ${e} · 총 ${results.reduce((a,r)=>a+r.count,0)}건`;
-
-document.getElementById('resultCards').innerHTML = sorted.map((r, i) => `
+  const sorted = [...results].sort((a,b) => b.count - a.count);
+  document.getElementById('meta').textContent = `${s} ~ ${e} · 총 ${results.reduce((a,r)=>a+r.count,0)}건`;
+  document.getElementById('resultCards').innerHTML = sorted.map((r, i) => `
 <div class="result-card">
 <div class="result-header" onclick="toggleArticles('card${i}')">
 <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:0.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--surface2);color:var(--text2);flex-shrink:0;${i<3?'background:rgba(124,106,247,0.15);color:var(--accent)':''}">${i+1}</span>
@@ -402,12 +445,11 @@ ${r.peakCount > 0 ? `<span class="result-peak">📈 ${r.peakDate} (${r.peakCount
 ${r.count > 0 ? `
 <div class="chart-wrap">
 <div class="chart-title" style="color:#7c6af7;margin-bottom:0.5rem">● 뉴스 보도량</div>
-<div class="chart">${r.bars}</div>
+<div>${r.bars}</div>
 </div>
-${r.searchBars ? `
-<div class="chart-wrap" style="border-top:1px solid var(--border)">
+${r.searchBars ? `<div class="chart-wrap" style="border-top:1px solid var(--border)">
 <div class="chart-title" style="color:#f7a94f;margin-bottom:0.5rem">● 검색량 트렌드</div>
-<div class="chart">${r.searchBars}</div>
+<div>${r.searchBars}</div>
 </div>` : ''}` : ''}
 <div class="articles-wrap" id="card${i}">
 ${r.articles.length > 0 ? r.articles.map((a, j) => `
@@ -420,42 +462,162 @@ ${r.articles.length > 0 ? r.articles.map((a, j) => `
 </div>`).join('') : '<div style="padding:1rem;color:var(--text2);font-size:0.85rem">기사가 없습니다</div>'}
 </div>
 </div>`).join('');
-
-document.getElementById('resultsWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.add('show');
 }
 
 function toggleArticles(id) {
-const el = document.getElementById(id);
-const idx = id.replace('card','');
-const icon = document.getElementById('icon'+idx);
-el.classList.toggle('show');
-icon.classList.toggle('open');
+  const el = document.getElementById(id);
+  const idx = id.replace('card','');
+  const icon = document.getElementById('icon'+idx);
+  el.classList.toggle('show');
+  icon.classList.toggle('open');
 }
 
 function resetAll() {
-results = [];
-document.getElementById('resultsWrap').classList.remove('show');
-document.getElementById('progressWrap').classList.remove('show');
-document.getElementById('bar').style.width = '0%';
+  results = [];
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('bar').style.width = '0%';
 }
 
 function exportCSV() {
-if (!results.length) return;
-const sorted = [...results].sort((a,b)=>b.count-a.count);
-const rows = [['순위','키워드','기사건수','피크날짜','피크건수']];
-sorted.forEach((r,i)=>rows.push([i+1,r.text,r.count,r.peakDate||'-',r.peakCount||0]));
-const csv = rows.map(r=>r.join(',')).join('\n');
-const a = document.createElement('a');
-a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
-a.download = `news_${document.getElementById('startDate').value}_${document.getElementById('endDate').value}.csv`;
-a.click();
+  if (!results.length) return;
+  const sorted = [...results].sort((a,b)=>b.count-a.count);
+  const rows = [['순위','키워드','기사건수','피크날짜','피크건수']];
+  sorted.forEach((r,i)=>rows.push([i+1,r.text,r.count,r.peakDate||'-',r.peakCount||0]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = `news_${document.getElementById('startDate').value}_${document.getElementById('endDate').value}.csv`;
+  a.click();
 }
 
 function copyTable() {
-if (!results.length) return;
-const sorted = [...results].sort((a,b)=>b.count-a.count);
-navigator.clipboard.writeText(sorted.map((r,i)=>`${i+1}\t${r.text}\t${r.count}\t${r.peakDate||'-'}`).join('\n'))
-.then(()=>alert('클립보드에 복사됐습니다'));
+  if (!results.length) return;
+  const sorted = [...results].sort((a,b)=>b.count-a.count);
+  navigator.clipboard.writeText(sorted.map((r,i)=>`${i+1}\t${r.text}\t${r.count}\t${r.peakDate||'-'}`).join('\n'))
+  .then(()=>alert('클립보드에 복사됐습니다'));
+}
+
+// 브리핑 생성
+async function generateBriefing() {
+  if (!results.length) { alert('먼저 수집 탭에서 뉴스를 수집해주세요.'); return; }
+  const btn = document.getElementById('briefBtn');
+  btn.disabled = true;
+  btn.textContent = '생성 중...';
+  const container = document.getElementById('briefCards');
+  container.innerHTML = '';
+
+  for (const r of results) {
+    if (!r.articles.length) continue;
+    const cardId = 'brief_' + r.text.replace(/\s/g,'_');
+    container.innerHTML += `<div class="brief-card" id="${cardId}"><div class="brief-loading">「${r.text}」 분석 중...</div></div>`;
+  }
+
+  for (const r of results) {
+    if (!r.articles.length) continue;
+    const cardId = 'brief_' + r.text.replace(/\s/g,'_');
+    const card = document.getElementById(cardId);
+    try {
+      const top20 = r.articles.slice(0, 20);
+      const prompt = `당신은 보건의료복지 분야 전문 분석가입니다. 다음은 "${r.text}" 키워드로 수집된 뉴스 기사 목록입니다.
+
+기사 목록:
+${top20.map((a,i)=>`${i+1}. ${a.title} (${a.dateStr}) - ${a.link}`).join('\n')}
+
+아래 형식으로 정확히 JSON만 출력하세요. 다른 텍스트나 마크다운 없이 JSON만:
+{
+  "tag": "긴급|주목|동향 중 하나",
+  "summary": "3~5문장으로 이 키워드의 최근 뉴스 흐름을 요약. 정중하지만 직설적이고 날카롭게.",
+  "refs": [
+    {"title": "기사제목1", "url": "기사URL1"},
+    {"title": "기사제목2", "url": "기사URL2"},
+    {"title": "기사제목3", "url": "기사URL3"}
+  ],
+  "beneficiary": "정책 수혜자(환자·당사자) 관점에서 2~4문장. 이 뉴스가 실제 당사자에게 어떤 의미인지 직설적으로.",
+  "civic": "공익 정책 시민단체 관점에서 2~4문장. 제도적·구조적 문제를 날카롭게 짚되 정중하게."
+}`;
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
+      const clean = text.replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(clean);
+
+      const tagClass = parsed.tag === '긴급' ? 'tag-urgent' : parsed.tag === '주목' ? 'tag-watch' : 'tag-trend';
+
+      card.innerHTML = `
+<div class="brief-header">
+  <div class="brief-kw">${r.text} <span style="font-size:0.8rem;color:var(--text2);font-weight:400">(${r.count}건)</span></div>
+  <span class="brief-tag ${tagClass}">${parsed.tag}</span>
+  <div class="brief-summary">${parsed.summary}</div>
+  <div class="brief-refs">
+    <div class="brief-ref-title">참고 기사</div>
+    ${parsed.refs.map((ref,i)=>`<div class="brief-ref-item">${i+1}. <a href="${ref.url}" target="_blank">${ref.title}</a></div>`).join('')}
+  </div>
+</div>
+<div class="brief-body">
+  <div class="brief-perspective">
+    <div class="brief-persp-label label-beneficiary">정책 수혜자 관점</div>
+    <div class="brief-persp-text">${parsed.beneficiary}</div>
+  </div>
+  <div class="brief-perspective">
+    <div class="brief-persp-label label-civic">정책 시민단체 관점</div>
+    <div class="brief-persp-text">${parsed.civic}</div>
+  </div>
+</div>
+<div class="brief-actions">
+  <button class="btn btn-secondary" onclick="copyBrief('${cardId}')">복사</button>
+</div>`;
+    } catch(err) {
+      card.innerHTML = `<div class="brief-loading" style="color:var(--error)">「${r.text}」 생성 실패. 다시 시도해주세요.</div>`;
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // 전체 복사 버튼
+  const copyAllDiv = document.createElement('div');
+  copyAllDiv.innerHTML = `<button class="btn btn-primary copy-all-btn" onclick="copyAllBriefs()">전체 브리핑 복사</button>`;
+  container.appendChild(copyAllDiv);
+
+  btn.disabled = false;
+  btn.textContent = '▶ 브리핑 재생성';
+}
+
+function copyBrief(cardId) {
+  const card = document.getElementById(cardId);
+  const kw = card.querySelector('.brief-kw')?.textContent?.trim() || '';
+  const tag = card.querySelector('.brief-tag')?.textContent?.trim() || '';
+  const summary = card.querySelector('.brief-summary')?.textContent?.trim() || '';
+  const refs = [...card.querySelectorAll('.brief-ref-item')].map(el=>el.textContent.trim()).join('\n');
+  const beneficiary = card.querySelector('.label-beneficiary')?.nextElementSibling?.textContent?.trim() || '';
+  const civic = card.querySelector('.label-civic')?.nextElementSibling?.textContent?.trim() || '';
+  const text = `【${kw}】 [${tag}]\n\n${summary}\n\n참고 기사\n${refs}\n\n▸ 정책 수혜자 관점\n${beneficiary}\n\n▸ 정책 시민단체 관점\n${civic}`;
+  navigator.clipboard.writeText(text).then(()=>alert('복사됐습니다'));
+}
+
+function copyAllBriefs() {
+  const cards = document.querySelectorAll('.brief-card');
+  const texts = [];
+  cards.forEach(card => {
+    const kw = card.querySelector('.brief-kw')?.textContent?.trim();
+    if (!kw) return;
+    const tag = card.querySelector('.brief-tag')?.textContent?.trim() || '';
+    const summary = card.querySelector('.brief-summary')?.textContent?.trim() || '';
+    const refs = [...card.querySelectorAll('.brief-ref-item')].map(el=>el.textContent.trim()).join('\n');
+    const beneficiary = card.querySelector('.label-beneficiary')?.nextElementSibling?.textContent?.trim() || '';
+    const civic = card.querySelector('.label-civic')?.nextElementSibling?.textContent?.trim() || '';
+    texts.push(`【${kw}】 [${tag}]\n\n${summary}\n\n참고 기사\n${refs}\n\n▸ 정책 수혜자 관점\n${beneficiary}\n\n▸ 정책 시민단체 관점\n${civic}`);
+  });
+  navigator.clipboard.writeText(texts.join('\n\n' + '─'.repeat(30) + '\n\n')).then(()=>alert('전체 브리핑이 복사됐습니다'));
 }
 
 initDates();
