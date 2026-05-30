@@ -251,7 +251,7 @@ async function fetchNaverChunk(keyword, startDate, endDate) {
   let reachedEnd = false;
   while (!reachedEnd && startIdx <= 1000) {
     try {
-      const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent(keyword)}&start=${startIdx}`);
+      const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent('"' + keyword + '"')}&start=${startIdx}`);
       if (!res.ok) break;
       const data = await res.json();
       if (!data.items || data.items.length === 0) break;
