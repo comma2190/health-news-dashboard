@@ -565,8 +565,21 @@ function resetAll() {
 function exportCSV() {
   if (!results.length) return;
   const sorted = [...results].sort((a,b)=>b.count-a.count);
-  const rows = [['순위','키워드','기사건수','피크날짜','피크건수']];
-  sorted.forEach((r,i)=>rows.push([i+1,r.text,r.count,r.peakDate||'-',r.peakCount||0]));
+  const rows = [['키워드','순위','기사제목','날짜','URL','총건수','피크날짜','피크건수']];
+  sorted.forEach((r,i) => {
+    r.articles.forEach((a,j) => {
+      rows.push([
+        r.text,
+        j+1,
+        '"' + (a.title||'').replace(/"/g,'""') + '"',
+        a.dateStr||'',
+        a.link||'',
+        r.count,
+        r.peakDate||'-',
+        r.peakCount||0
+      ]);
+    });
+  });
   const csv = rows.map(r=>r.join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
