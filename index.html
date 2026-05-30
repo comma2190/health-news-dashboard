@@ -75,7 +75,7 @@ async function login(){
     body:JSON.stringify({password})
   });
   if(res.ok){
-    location.href='/newsdesk2190.html';
+    sessionStorage.setItem('xi0_auth','0610'); location.href='/home.html';
   }else{
     document.getElementById('msg').textContent='비밀번호가 틀렸습니다.';
   }
