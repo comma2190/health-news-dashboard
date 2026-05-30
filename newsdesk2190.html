@@ -620,7 +620,7 @@ function copyTable() {
   const lines = [];
   sorted.forEach((r,i) => {
     lines.push(`키워드: ${r.text} (총 ${r.count}건, 피크: ${r.peakDate||'-'})`);
-    r.articles.slice(0,20).forEach((a,j) => {
+    r.articles.forEach((a,j) => {
       lines.push(`${j+1}. ${a.title} (${a.dateStr}) - ${a.link}`);
     });
     lines.push('');
