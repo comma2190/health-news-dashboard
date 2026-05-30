@@ -495,7 +495,15 @@ function exportCSV() {
 function copyTable() {
   if (!results.length) return;
   const sorted = [...results].sort((a,b)=>b.count-a.count);
-  navigator.clipboard.writeText(sorted.map((r,i)=>`${i+1}\t${r.text}\t${r.count}\t${r.peakDate||'-'}`).join('\n'))
+  const lines = [];
+  sorted.forEach((r,i) => {
+    lines.push(`키워드: ${r.text} (총 ${r.count}건, 피크: ${r.peakDate||'-'})`);
+    r.articles.slice(0,20).forEach((a,j) => {
+      lines.push(`${j+1}. ${a.title} (${a.dateStr}) - ${a.link}`);
+    });
+    lines.push('');
+  });
+  navigator.clipboard.writeText(lines.join('\n'))
   .then(()=>alert('클립보드에 복사됐습니다'));
 }
 
