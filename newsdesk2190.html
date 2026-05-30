@@ -78,13 +78,7 @@ input:focus, select:focus { border-color:var(--accent); }
 .results-wrap { display:none; }
 .results-wrap.show { display:block; }
 
-/* 탭 */
-.tab-bar { display:none; gap:0.5rem; margin-bottom:1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.4rem; }
-.tab-bar.show { display:flex; }
-.tab-btn { flex:1; padding:0.6rem; border-radius:8px; border:none; background:transparent; color:var(--text2); font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; }
-.tab-btn.active { background:var(--accent); color:white; }
-.tab-content { display:none; }
-.tab-content.active { display:block; }
+
 
 /* 브리핑 */
 .brief-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:1.2rem; overflow:hidden; }
@@ -476,6 +470,8 @@ async function startCollection() {
   document.getElementById('runBtn').disabled = false;
   renderResults(s, e);
   document.getElementById('lastRun').textContent = '마지막 수집: ' + new Date().toLocaleString('ko-KR');
+  sessionStorage.setItem('newsdesk_results', JSON.stringify(results));
+  sessionStorage.setItem('newsdesk_date', s + ' ~ ' + e);
   // 브리핑용 데이터 저장
   sessionStorage.setItem('newsdesk_results', JSON.stringify(results));
   sessionStorage.setItem('newsdesk_date', s + ' ~ ' + e);
@@ -557,126 +553,9 @@ function copyTable() {
   .then(()=>alert('클립보드에 복사됐습니다'));
 }
 
-// 브리핑 생성
-async function generateBriefing() {
-  if (!results.length) { alert('먼저 수집 탭에서 뉴스를 수집해주세요.'); return; }
-  const btn = document.getElementById('briefBtn');
-  btn.disabled = true;
-  btn.textContent = '생성 중...';
-  const container = document.getElementById('briefCards');
-  container.innerHTML = '';
 
-  for (const r of results) {
-    if (!r.articles.length) continue;
-    const cardId = 'brief_' + r.text.replace(/\s/g,'_');
-    container.innerHTML += `<div class="brief-card" id="${cardId}"><div class="brief-loading">「${r.text}」 분석 중...</div></div>`;
-  }
 
-  for (const r of results) {
-    if (!r.articles.length) continue;
-    const cardId = 'brief_' + r.text.replace(/\s/g,'_');
-    const card = document.getElementById(cardId);
-    try {
-      const top20 = r.articles.slice(0, 20);
-      const prompt = `당신은 보건의료복지 분야 전문 분석가입니다. 다음은 "${r.text}" 키워드로 수집된 뉴스 기사 목록입니다.
 
-기사 목록:
-${top20.map((a,i)=>`${i+1}. ${a.title} (${a.dateStr}) - ${a.link}`).join('\n')}
-
-아래 형식으로 정확히 JSON만 출력하세요. 다른 텍스트나 마크다운 없이 JSON만:
-{
-  "tag": "긴급|주목|동향 중 하나",
-  "summary": "3~5문장으로 이 키워드의 최근 뉴스 흐름을 요약. 정중하지만 직설적이고 날카롭게.",
-  "refs": [
-    {"title": "기사제목1", "url": "기사URL1"},
-    {"title": "기사제목2", "url": "기사URL2"},
-    {"title": "기사제목3", "url": "기사URL3"}
-  ],
-  "beneficiary": "정책 수혜자(환자·당사자) 관점에서 2~4문장. 이 뉴스가 실제 당사자에게 어떤 의미인지 직설적으로.",
-  "civic": "공익 정책 시민단체 관점에서 2~4문장. 제도적·구조적 문제를 날카롭게 짚되 정중하게."
-}`;
-
-      const res = await fetch('https://news-api-three.vercel.app/api/briefing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-      const data = await res.json();
-      const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('');
-      const clean = text.replace(/```json|```/g,'').trim();
-      const parsed = JSON.parse(clean);
-
-      const tagClass = parsed.tag === '긴급' ? 'tag-urgent' : parsed.tag === '주목' ? 'tag-watch' : 'tag-trend';
-
-      card.innerHTML = `
-<div class="brief-header">
-  <div class="brief-kw">${r.text} <span style="font-size:0.8rem;color:var(--text2);font-weight:400">(${r.count}건)</span></div>
-  <span class="brief-tag ${tagClass}">${parsed.tag}</span>
-  <div class="brief-summary">${parsed.summary}</div>
-  <div class="brief-refs">
-    <div class="brief-ref-title">참고 기사</div>
-    ${parsed.refs.map((ref,i)=>`<div class="brief-ref-item">${i+1}. <a href="${ref.url}" target="_blank">${ref.title}</a></div>`).join('')}
-  </div>
-</div>
-<div class="brief-body">
-  <div class="brief-perspective">
-    <div class="brief-persp-label label-beneficiary">정책 수혜자 관점</div>
-    <div class="brief-persp-text">${parsed.beneficiary}</div>
-  </div>
-  <div class="brief-perspective">
-    <div class="brief-persp-label label-civic">정책 시민단체 관점</div>
-    <div class="brief-persp-text">${parsed.civic}</div>
-  </div>
-</div>
-<div class="brief-actions">
-  <button class="btn btn-secondary" onclick="copyBrief('${cardId}')">복사</button>
-</div>`;
-    } catch(err) {
-      card.innerHTML = `<div class="brief-loading" style="color:var(--error)">「${r.text}」 생성 실패. 다시 시도해주세요.</div>`;
-    }
-    await new Promise(r => setTimeout(r, 300));
-  }
-
-  // 전체 복사 버튼
-  const copyAllDiv = document.createElement('div');
-  copyAllDiv.innerHTML = `<button class="btn btn-primary copy-all-btn" onclick="copyAllBriefs()">전체 브리핑 복사</button>`;
-  container.appendChild(copyAllDiv);
-
-  btn.disabled = false;
-  btn.textContent = '▶ 브리핑 재생성';
-}
-
-function copyBrief(cardId) {
-  const card = document.getElementById(cardId);
-  const kw = card.querySelector('.brief-kw')?.textContent?.trim() || '';
-  const tag = card.querySelector('.brief-tag')?.textContent?.trim() || '';
-  const summary = card.querySelector('.brief-summary')?.textContent?.trim() || '';
-  const refs = [...card.querySelectorAll('.brief-ref-item')].map(el=>el.textContent.trim()).join('\n');
-  const beneficiary = card.querySelector('.label-beneficiary')?.nextElementSibling?.textContent?.trim() || '';
-  const civic = card.querySelector('.label-civic')?.nextElementSibling?.textContent?.trim() || '';
-  const text = `【${kw}】 [${tag}]\n\n${summary}\n\n참고 기사\n${refs}\n\n▸ 정책 수혜자 관점\n${beneficiary}\n\n▸ 정책 시민단체 관점\n${civic}`;
-  navigator.clipboard.writeText(text).then(()=>alert('복사됐습니다'));
-}
-
-function copyAllBriefs() {
-  const cards = document.querySelectorAll('.brief-card');
-  const texts = [];
-  cards.forEach(card => {
-    const kw = card.querySelector('.brief-kw')?.textContent?.trim();
-    if (!kw) return;
-    const tag = card.querySelector('.brief-tag')?.textContent?.trim() || '';
-    const summary = card.querySelector('.brief-summary')?.textContent?.trim() || '';
-    const refs = [...card.querySelectorAll('.brief-ref-item')].map(el=>el.textContent.trim()).join('\n');
-    const beneficiary = card.querySelector('.label-beneficiary')?.nextElementSibling?.textContent?.trim() || '';
-    const civic = card.querySelector('.label-civic')?.nextElementSibling?.textContent?.trim() || '';
-    texts.push(`【${kw}】 [${tag}]\n\n${summary}\n\n참고 기사\n${refs}\n\n▸ 정책 수혜자 관점\n${beneficiary}\n\n▸ 정책 시민단체 관점\n${civic}`);
-  });
-  navigator.clipboard.writeText(texts.join('\n\n' + '─'.repeat(30) + '\n\n')).then(()=>alert('전체 브리핑이 복사됐습니다'));
-}
 
 initDates();
 renderKw();
