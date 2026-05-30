@@ -398,7 +398,6 @@ async function fetchDatalab(keyword, startDate, endDate) {
 }
 
 function buildCombinedChart(articles, startDate, endDate, datalabData) {
-  // 날짜별 뉴스 건수
   const dateCounts = {};
   const start = new Date(startDate), end = new Date(endDate);
   for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1))
@@ -409,76 +408,69 @@ function buildCombinedChart(articles, startDate, endDate, datalabData) {
   const newsMax = Math.max(...newsCounts, 1);
   const newsPeakIdx = newsCounts.indexOf(Math.max(...newsCounts));
 
-  // 검색트렌드
   const hasSearch = datalabData?.results?.[0]?.data;
-  let searchPts = [];
+  let searchRatios = [];
   if (hasSearch) {
     const pts = datalabData.results[0].data;
     const maxV = Math.max(...pts.map(p=>p.ratio), 1);
-    searchPts = pts.map(p => ({ date: p.period.split('T')[0], ratio: p.ratio/maxV }));
+    const byDate = {};
+    pts.forEach(p => { byDate[p.period.slice(0,10)] = p.ratio/maxV; });
+    searchRatios = dates.map(d => byDate[d] !== undefined ? byDate[d] : null);
   }
 
-  const W = 800, padL = 10, padR = 10;
-  const H1 = 70, H2 = 70, gap = 24, totalH = H1 + gap + H2 + 20;
+  const W = 800, padL = 10, padR = 10, padT = 28, padB = 18, CH = 90, LABEL_H = 16;
   const n = dates.length;
   const xStep = n > 1 ? (W - padL - padR) / (n-1) : 0;
 
-  // 뉴스 차트 포인트
-  const nPts = newsCounts.map((c,i) => [padL + i*xStep, 28 + (1 - c/newsMax)*(H1-36)]);
-  const nLine = nPts.map(([x,y])=>`${x},${y}`).join(' ');
-  const nArea = `M${padL},${H1} ` + nPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H1} Z`;
-  const [npx,npy] = nPts[newsPeakIdx];
-  const nPeak = newsCounts[newsPeakIdx] > 0 ? `<circle cx="${npx}" cy="${npy}" r="4" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${npx}" y="${npy-18}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${dates[newsPeakIdx].slice(5)}</text><text x="${npx}" y="${npy-8}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[newsPeakIdx]}건</text>` : '';
-  const nDots = nPts.map(([x,y],i) => {
-    if (i === newsPeakIdx || newsCounts[i] === 0) return '';
-    return `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.7"/><text x="${x}" y="${y-6}" font-size="8" fill="#7c6af7" opacity="0.8" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[i]}</text>`;
-  }).join('');
-
-  // 검색트렌드 차트 포인트 (x축을 뉴스 날짜 기준으로 맞춤)
-  let sLine = '', sArea = '', sPeak = '';
-  const sy = H1 + gap;
-  if (searchPts.length > 1) {
-    const sPtsMapped = dates.map((d,i) => {
-      const found = searchPts.find(p => p.date === d);
-      const ratio = found ? found.ratio : null;
-      return { x: padL + i*xStep, ratio, date: d };
-    });
-    const validPts = sPtsMapped.filter(p => p.ratio !== null);
-    if (validPts.length > 1) {
-      const sCoords = validPts.map(p => [p.x, sy + 8 + (1-p.ratio)*(H2-16), p.date]);
-      sLine = sCoords.map(([x,y])=>`${x},${y}`).join(' ');
-      sArea = `M${sCoords[0][0]},${sy+H2} ` + sCoords.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${sCoords[sCoords.length-1][0]},${sy+H2} Z`;
-      const sMaxIdx = sCoords.indexOf(sCoords.reduce((a,b)=>a[1]<b[1]?a:b));
-      const [spx, spy, spDate] = sCoords[sMaxIdx];
-      sPeak = `<circle cx="${spx}" cy="${spy}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${spx}" y="${spy-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${spDate.slice(5)}</text>`;
-    }
-  }
-
-  // x축 라벨 (공유)
   const labelStep = Math.max(1, Math.ceil(n/7));
-  const xLabels = dates.map((d,i) => {
+  const xLabelsFn = (offsetY) => dates.map((d,i) => {
     if (i % labelStep !== 0 && i !== n-1) return '';
-    return `<text x="${padL + i*xStep}" y="${totalH}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
+    return `<text x="${padL + i*xStep}" y="${offsetY}" font-size="9" fill="#8888a8" text-anchor="middle" font-family="JetBrains Mono">${d.slice(5)}</text>`;
   }).join('');
 
-  // 구분선
-  const divLine = `<line x1="${padL}" y1="${H1+gap/2}" x2="${W-padR}" y2="${H1+gap/2}" stroke="#2a2a38" stroke-width="0.5"/>`;
-
-  const svg = `<svg viewBox="0 0 ${W} ${totalH+4}" preserveAspectRatio="none" style="width:100%;height:200px;display:block;overflow:visible">
-<defs>
-<linearGradient id="ng" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient>
-<linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient>
-</defs>
+  // 뉴스 SVG
+  const nPts = newsCounts.map((c,i) => [padL + i*xStep, padT + (1 - c/newsMax)*(CH - padT - padB)]);
+  const nLine = nPts.map(([x,y])=>`${x},${y}`).join(' ');
+  const nArea = `M${padL},${CH} ` + nPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${CH} Z`;
+  const [npx,npy] = nPts[newsPeakIdx];
+  const nPeak = newsCounts[newsPeakIdx] > 0
+    ? `<circle cx="${npx}" cy="${npy}" r="4" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/>
+       <text x="${npx}" y="${npy-16}" font-size="9" fill="#e8e8f0" text-anchor="middle" font-family="JetBrains Mono">${dates[newsPeakIdx].slice(5)}</text>
+       <text x="${npx}" y="${npy-6}" font-size="9" fill="#e8e8f0" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[newsPeakIdx]}건</text>` : '';
+  const nDots = nPts.map(([x,y],i) => i===newsPeakIdx||newsCounts[i]===0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.7"/>`).join('');
+  const nTotalH = CH + LABEL_H;
+  const newsSvg = `<svg viewBox="0 0 ${W} ${nTotalH}" preserveAspectRatio="none" style="width:100%;height:90px;display:block">
+<defs><linearGradient id="ng" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${nArea}" fill="url(#ng)"/>
 <polyline points="${nLine}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 ${nDots}${nPeak}
-${divLine}
-${sArea ? `<path d="${sArea}" fill="url(#sg)"/>` : ''}
-${sLine ? `<polyline points="${sLine}" fill="none" stroke="#f7a94f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` : ''}
-${sPeak}
-${xLabels}
+${xLabelsFn(nTotalH)}
 </svg>`;
 
+  // 검색트렌드 SVG
+  let searchSvg = '';
+  const validSearch = searchRatios.filter(v=>v!==null);
+  if (validSearch.length > 1) {
+    const sPts = searchRatios.map((v,i) => v !== null ? [padL + i*xStep, padT + (1-v)*(CH - padT - padB)] : null).filter(Boolean);
+    const sLine = sPts.map(([x,y])=>`${x},${y}`).join(' ');
+    const sArea = `M${sPts[0][0]},${CH} ` + sPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${sPts[sPts.length-1][0]},${CH} Z`;
+    const sPeakPt = sPts.reduce((a,b)=>a[1]<b[1]?a:b);
+    const sPeakIdx = sPts.indexOf(sPeakPt);
+    const sPeakDate = dates[searchRatios.findIndex((v,i)=>v!==null && padL+i*xStep===sPeakPt[0])];
+    const sPeak = `<circle cx="${sPeakPt[0]}" cy="${sPeakPt[1]}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>
+      <text x="${sPeakPt[0]}" y="${sPeakPt[1]-16}" font-size="9" fill="#e8e8f0" text-anchor="middle" font-family="JetBrains Mono">${sPeakDate ? sPeakDate.slice(5) : ''}</text>
+      <text x="${sPeakPt[0]}" y="${sPeakPt[1]-6}" font-size="9" fill="#e8e8f0" text-anchor="middle" font-family="JetBrains Mono">peak</text>`;
+    const sTotalH = CH + LABEL_H;
+    searchSvg = `<svg viewBox="0 0 ${W} ${sTotalH}" preserveAspectRatio="none" style="width:100%;height:90px;display:block;margin-top:4px">
+<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient></defs>
+<path d="${sArea}" fill="url(#sg)"/>
+<polyline points="${sLine}" fill="none" stroke="#f7a94f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+${sPeak}
+${xLabelsFn(sTotalH)}
+</svg>`;
+  }
+
+  const svg = newsSvg + searchSvg;
   return { svg, peakDate: dates[newsPeakIdx], peakCount: newsCounts[newsPeakIdx], dateCounts };
 }
 
