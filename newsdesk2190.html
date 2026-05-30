@@ -706,6 +706,20 @@ function copyAllBriefs() {
 
 initDates();
 renderKw();
+
+// radar.html에서 넘어온 경우 키워드 자동 로드
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const kws = params.get('keywords');
+  const start = params.get('start');
+  const end = params.get('end');
+  if (kws) {
+    keywords = kws.split(',').filter(Boolean).map(t => ({ text: t }));
+    renderKw();
+  }
+  if (start) document.getElementById('startDate').value = start;
+  if (end) document.getElementById('endDate').value = end;
+})();
 </script>
 </body>
 </html>
