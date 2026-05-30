@@ -11,6 +11,7 @@
   --border:#2a2a38; --accent:#7c6af7; --accent2:#4fc3f7;
   --text:#e8e8f0; --text2:#8888a8;
   --success:#4caf82; --warning:#f7a94f; --error:#f76a6a;
+  --highlight:#4fc3f7;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding:1.2rem; }
@@ -34,12 +35,35 @@ input:focus { border-color:var(--accent); }
 .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
 .btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
 .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
-.add-row { display:flex; gap:0.5rem; margin-top:0.8rem; }
+
+/* 섹터 선택 UI */
+.sector-group { margin-bottom:0.5rem; }
+.sector-group.highlight .sector-header { border-color:var(--highlight); background:rgba(79,195,247,0.06); }
+.sector-group.highlight .sector-name { color:var(--highlight); }
+.sector-divider { height:1px; background:var(--border); margin:1rem 0; }
+.sector-header { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.9rem; background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s; user-select:none; }
+.sector-header:hover { border-color:var(--accent); }
+.sector-header.all-selected { border-color:var(--accent); background:rgba(124,106,247,0.1); }
+.sector-name { font-size:0.88rem; font-weight:600; }
+.sector-meta { display:flex; align-items:center; gap:0.5rem; }
+.sector-count { font-size:0.72rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+.sector-toggle { font-size:0.72rem; color:var(--accent); font-weight:600; }
+.sector-body { display:none; padding:0.6rem 0.3rem 0.3rem; flex-wrap:wrap; gap:0.4rem; }
+.sector-body.open { display:flex; }
+.sub-tag { display:inline-flex; align-items:center; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.8rem; background:var(--surface2); border:1px solid var(--border); cursor:pointer; transition:all 0.15s; user-select:none; }
+.sub-tag:hover { border-color:var(--accent); }
+.sub-tag.selected { background:rgba(124,106,247,0.12); border-color:var(--accent); color:var(--accent); }
+.sector-group.highlight .sub-tag.selected { background:rgba(79,195,247,0.1); border-color:var(--highlight); color:var(--highlight); }
+
+.selected-preview { display:flex; flex-wrap:wrap; gap:0.4rem; min-height:32px; margin-bottom:0.8rem; }
+.preview-tag { display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.6rem; border-radius:5px; font-size:0.78rem; background:rgba(124,106,247,0.12); border:1px solid var(--accent); color:var(--accent); }
+.preview-tag span { cursor:pointer; color:var(--text2); }
+.preview-tag span:hover { color:var(--error); }
+.preview-empty { font-size:0.82rem; color:var(--text2); padding:0.3rem 0; }
+
+.add-row { display:flex; gap:0.5rem; padding-top:0.8rem; border-top:1px solid var(--border); margin-top:0.8rem; }
 .add-row input { flex:1; min-width:0; }
-.seed-grid { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem; min-height:32px; }
-.seed-tag { display:inline-flex; align-items:center; gap:0.4rem; background:var(--surface2); border:1px solid var(--accent); border-radius:6px; padding:0.3rem 0.7rem; font-size:0.82rem; color:var(--accent); }
-.seed-tag span { cursor:pointer; color:var(--text2); font-size:0.7rem; }
-.seed-tag span:hover { color:var(--error); }
+
 .progress-wrap { display:none; }
 .progress-wrap.show { display:block; }
 .bar-bg { background:var(--surface2); border-radius:100px; height:6px; margin:0.8rem 0; overflow:hidden; }
@@ -50,7 +74,7 @@ input:focus { border-color:var(--accent); }
 
 .results-wrap { display:none; }
 .results-wrap.show { display:block; }
-.kw-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:0.6rem; }
+.kw-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.6rem; }
 .kw-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:0.8rem 1rem; cursor:pointer; transition:all 0.2s; position:relative; }
 .kw-item:hover { border-color:var(--accent); background:rgba(124,106,247,0.08); transform:translateY(-1px); }
 .kw-item.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); }
@@ -67,7 +91,6 @@ input:focus { border-color:var(--accent); }
 input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-
 @media (max-width:480px) {
   body { padding:0.8rem; }
   h1 { font-size:1.1rem; }
@@ -79,15 +102,21 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <body>
 <header>
   <h1>이슈 <span>레이더</span></h1>
-  <p class="subtitle">넓은 키워드로 수집 → 빈도 높은 이슈 추출 → newsdesk로 정밀 수집</p>
+  <p class="subtitle">섹터 선택 → 뉴스 수집 → 빈도 높은 이슈 추출 → newsdesk 정밀 수집</p>
 </header>
 
 <div class="card">
-  <div class="section-title">시드 키워드</div>
-  <div class="seed-grid" id="seedGrid"></div>
+  <div class="section-title">섹터 선택</div>
+  <div id="sectorList"></div>
+
   <div class="add-row">
-    <input type="text" id="newSeed" placeholder="키워드 입력..." onkeydown="if(event.key==='Enter'&&!event.isComposing)addSeed()">
-    <button class="btn btn-secondary" onclick="addSeed()">+ 추가</button>
+    <input type="text" id="newSeed" placeholder="직접 키워드 추가..." onkeydown="if(event.key==='Enter'&&!event.isComposing)addCustom()">
+    <button class="btn btn-secondary" onclick="addCustom()">+ 추가</button>
+  </div>
+
+  <div style="margin-top:1rem">
+    <div style="font-size:0.72rem;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem">선택된 키워드 (<span id="selectedCount">0</span>개)</div>
+    <div class="selected-preview" id="selectedPreview"><span class="preview-empty">선택된 키워드가 없습니다</span></div>
   </div>
 </div>
 
@@ -118,7 +147,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
     </div>
     <div class="kw-grid" id="kwGrid"></div>
     <div class="action-row">
-      <button class="btn btn-secondary" onclick="selectAll()">전체 선택</button>
+      <button class="btn btn-secondary" onclick="selectAllKw()">전체 선택</button>
       <button class="btn btn-primary" onclick="goToNewsdesk()">선택 키워드로 newsdesk 이동 →</button>
     </div>
   </div>
@@ -128,27 +157,125 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 const API_BASE = 'https://news-api-three.vercel.app/api/naver';
 const NEWSDESK_URL = 'https://health-news-dashboard.vercel.app/newsdesk2190.html';
 
-// 불용어 목록
-const STOPWORDS = new Set([
-  '이','그','저','것','수','등','및','또','더','이미','이후','이전','현재','이번','지난',
-  '오늘','내일','어제','올해','지난해','올해','매년','매월','매일','관련','대한','위한',
-  '통한','따른','있는','없는','하는','되는','이는','하고','있다','없다','한다','된다',
-  '했다','됐다','했다','라고','에서','으로','까지','부터','에게','에도','에만','에서',
-  '정도','경우','문제','상황','필요','가능','지원','진행','추진','계획','발표','강조',
-  '제시','검토','마련','실시','시행','도입','개선','확대','강화','운영','관리','제공',
-  '위해','통해','대해','따라','대한','위한','관한','향한','뒤','앞','속','안','밖',
-  '가','나','다','라','마','바','사','아','자','차','카','타','파','하',
-  '것이','것을','것은','것도','것만','하여','하며','하면','하지','하기','하고','하는',
-  '이다','이며','이고','이나','이에','이를','이가','이도','이만','이라','이야',
-  '년','월','일','시','분','초','개','명','건','원','만','억','조','번','회',
-  '및','또한','아울러','특히','다만','즉','곧','그러나','하지만','그런데','그래서',
-  '따라서','그러므로','왜냐하면','물론','사실','결국','이처럼','이러한','이런','저런',
-  '뉴스','기사','보도','언론','미디어','기자','취재','인터뷰','발언','입장',
-]);
+const SECTORS = [
+  {
+    name: '보건/의료', highlight: true,
+    subs: ['의료정책/제도','건강보험','공공의료','의료인력','병원/의원','제약/신약','의료기기','감염병/방역','만성질환','희귀질환','정신건강','여성/모성건강','노인건강/치매','재활/한의학']
+  },
+  {
+    name: '복지/돌봄', highlight: true,
+    subs: ['노인돌봄/장기요양','장애인복지','기초생활/빈곤','아동복지','청년복지','가족/다문화']
+  },
+  { divider: true },
+  {
+    name: '정치',
+    subs: ['대통령/청와대','국회/입법','선거/정당','외교','안보/국방','북한','지방정치','사법/헌법']
+  },
+  {
+    name: '경제',
+    subs: ['거시경제/경기','금융/은행','증권/주식','부동산','대기업/재벌','중소기업/스타트업','노동/고용','무역/수출','소비/유통','에너지/자원','농업/수산']
+  },
+  {
+    name: '사회',
+    subs: ['교육/입시','환경/기후','재난/안전','법원/판결','경찰/범죄','인권/젠더','이민/다문화','주거/도시','교통']
+  },
+  {
+    name: '문화/생활',
+    subs: ['문화/예술','음식/요리','여행/관광','패션/뷰티','종교','언어/출판']
+  },
+  {
+    name: '국제',
+    subs: ['미국','중국','일본','유럽','동남아','중동/아프리카','국제기구/UN']
+  },
+  {
+    name: 'IT/과학',
+    subs: ['AI/로봇','모바일/통신','인터넷/플랫폼','반도체/하드웨어','우주/천문','생명과학','보안/해킹']
+  },
+  {
+    name: '스포츠',
+    subs: ['축구','야구','농구/배구','골프','격투기','올림픽/국제대회','e스포츠']
+  },
+  {
+    name: '연예',
+    subs: ['영화','드라마','음악/아이돌','방송/예능','웹툰/게임']
+  },
+];
 
-let seeds = [];
+const STOPWORDS = new Set(['이','그','저','것','수','등','및','또','더','이미','이후','이전','현재','이번','지난','오늘','내일','어제','올해','관련','대한','위한','통한','따른','있는','없는','하는','되는','이는','하고','있다','없다','한다','된다','했다','됐다','라고','에서','으로','까지','부터','에게','정도','경우','문제','상황','필요','가능','지원','진행','추진','계획','발표','강조','제시','검토','마련','실시','시행','도입','개선','확대','강화','운영','관리','제공','위해','통해','대해','따라','뒤','앞','속','안','밖','것이','것을','것은','하여','하며','하면','하지','하기','이다','이며','이고','이나','이에','이를','년','월','일','시','분','초','개','명','건','원','만','억','번','회','및','또한','특히','다만','그러나','하지만','그런데','그래서','따라서','왜냐하면','물론','사실','결국','이처럼','이러한','이런','저런','뉴스','기사','보도','언론','기자','취재','발언','입장']);
+
+let selectedSubs = new Set();
+let customSeeds = [];
 let allKeywords = [];
 let selectedKws = new Set();
+let openSectors = new Set();
+
+function renderSectors() {
+  const container = document.getElementById('sectorList');
+  container.innerHTML = SECTORS.map((s, si) => {
+    if (s.divider) return `<div class="sector-divider"></div>`;
+    const allSel = s.subs.every(sub => selectedSubs.has(sub));
+    const someSel = s.subs.some(sub => selectedSubs.has(sub));
+    const isOpen = openSectors.has(si);
+    const selCount = s.subs.filter(sub => selectedSubs.has(sub)).length;
+    return `<div class="sector-group${s.highlight?' highlight':''}">
+      <div class="sector-header${allSel?' all-selected':''}" onclick="toggleSector(${si})">
+        <span class="sector-name">${s.name}</span>
+        <div class="sector-meta">
+          ${someSel ? `<span class="sector-count">${selCount}/${s.subs.length}</span>` : `<span class="sector-count">${s.subs.length}개</span>`}
+          <span class="sector-toggle" onclick="event.stopPropagation();toggleAllSubs(${si})">${allSel?'전체해제':'전체선택'}</span>
+          <span style="color:var(--text2);font-size:0.75rem">${isOpen?'▲':'▼'}</span>
+        </div>
+      </div>
+      <div class="sector-body${isOpen?' open':''}" id="sectorBody${si}">
+        ${s.subs.map(sub => `<div class="sub-tag${selectedSubs.has(sub)?' selected':''}" onclick="toggleSub('${sub}',${si})">${sub}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSector(si) {
+  if (openSectors.has(si)) openSectors.delete(si);
+  else openSectors.add(si);
+  renderSectors();
+}
+
+function toggleAllSubs(si) {
+  const s = SECTORS[si];
+  const allSel = s.subs.every(sub => selectedSubs.has(sub));
+  s.subs.forEach(sub => allSel ? selectedSubs.delete(sub) : selectedSubs.add(sub));
+  renderSectors();
+  renderPreview();
+}
+
+function toggleSub(sub, si) {
+  if (selectedSubs.has(sub)) selectedSubs.delete(sub);
+  else selectedSubs.add(sub);
+  renderSectors();
+  renderPreview();
+}
+
+function renderPreview() {
+  const all = [...selectedSubs, ...customSeeds];
+  document.getElementById('selectedCount').textContent = all.length;
+  const el = document.getElementById('selectedPreview');
+  if (!all.length) { el.innerHTML = '<span class="preview-empty">선택된 키워드가 없습니다</span>'; return; }
+  el.innerHTML = all.map(k => `<div class="preview-tag">${k}<span onclick="removeFromPreview('${k}')">×</span></div>`).join('');
+}
+
+function removeFromPreview(k) {
+  selectedSubs.delete(k);
+  customSeeds = customSeeds.filter(s => s !== k);
+  renderSectors();
+  renderPreview();
+}
+
+function addCustom() {
+  const v = document.getElementById('newSeed').value.trim();
+  if (!v || customSeeds.includes(v) || selectedSubs.has(v)) return;
+  customSeeds.push(v);
+  document.getElementById('newSeed').value = '';
+  renderPreview();
+}
 
 function initDates() {
   const today = new Date().toISOString().split('T')[0];
@@ -156,21 +283,6 @@ function initDates() {
   document.getElementById('startDate').value = weekAgo;
   document.getElementById('endDate').value = today;
 }
-
-function renderSeeds() {
-  document.getElementById('seedGrid').innerHTML = seeds.map((s,i) => `
-    <div class="seed-tag">${s}<span onclick="removeSeed(${i})">×</span></div>`).join('');
-}
-
-function addSeed() {
-  const v = document.getElementById('newSeed').value.trim();
-  if (!v || seeds.includes(v)) return;
-  seeds.push(v);
-  document.getElementById('newSeed').value = '';
-  renderSeeds();
-}
-
-function removeSeed(i) { seeds.splice(i,1); renderSeeds(); }
 
 function addLog(msg, type='info') {
   const el = document.createElement('div');
@@ -185,20 +297,17 @@ function splitDateRange(startDate, endDate) {
   const end = new Date(endDate);
   while (cur <= end) {
     const from = cur.toISOString().split('T')[0];
-    const to = new Date(Math.min(cur.getTime() + 4*86400000, end.getTime())).toISOString().split('T')[0];
+    const to = new Date(Math.min(cur.getTime()+4*86400000, end.getTime())).toISOString().split('T')[0];
     ranges.push({ from, to });
-    cur = new Date(cur.getTime() + 5*86400000);
+    cur = new Date(cur.getTime()+5*86400000);
   }
   return ranges;
 }
 
 async function fetchTitles(keyword, startDate, endDate) {
-  const startMs = new Date(startDate).getTime();
-  const endMs = new Date(endDate + 'T23:59:59').getTime();
   const ranges = splitDateRange(startDate, endDate);
   let titles = [];
   const seen = new Set();
-
   for (const { from, to } of ranges) {
     let idx = 1, reached = false;
     while (!reached && idx <= 1000) {
@@ -227,38 +336,21 @@ async function fetchTitles(keyword, startDate, endDate) {
 function extractKeywords(titles) {
   const freq = {};
   for (const title of titles) {
-    // 특수문자 제거, 공백 분리
-    const words = title
-      .replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g, ' ')
-      .split(/\s+/)
-      .filter(w => w.length >= 2);
-
-    // 2~5글자 한글 단어 + 영문 단어
+    const words = title.replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>=2);
     for (const w of words) {
       const isKorean = /^[\uAC00-\uD7A3]{2,5}$/.test(w);
       const isEnglish = /^[a-zA-Z]{3,}$/.test(w);
       if (!isKorean && !isEnglish) continue;
       if (STOPWORDS.has(w)) continue;
-      freq[w] = (freq[w] || 0) + 1;
-    }
-
-    // 2글자 연속 조합 (한글)
-    const korOnly = title.replace(/[^\uAC00-\uD7A3\s]/g,' ').split(/\s+/).join('');
-    for (let i=0; i<korOnly.length-1; i++) {
-      const bi = korOnly.slice(i, i+2);
-      if (/^[\uAC00-\uD7A3]{2}$/.test(bi) && !STOPWORDS.has(bi)) {
-        // bigram은 가중치 낮게
-      }
+      freq[w] = (freq[w]||0)+1;
     }
   }
-  return Object.entries(freq)
-    .filter(([w,c]) => c >= 2)
-    .sort((a,b) => b[1]-a[1])
-    .slice(0, 30);
+  return Object.entries(freq).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,30);
 }
 
 async function startScan() {
-  if (!seeds.length) { alert('시드 키워드를 추가해주세요'); return; }
+  const seeds = [...selectedSubs, ...customSeeds];
+  if (!seeds.length) { alert('키워드를 선택해주세요'); return; }
   const s = document.getElementById('startDate').value;
   const e = document.getElementById('endDate').value;
   if (!s||!e) { alert('날짜를 입력해주세요'); return; }
@@ -270,13 +362,13 @@ async function startScan() {
   document.getElementById('bar').style.width = '0%';
 
   let allTitles = [];
-  addLog(`스캔 시작: ${s} ~ ${e}`, 'info');
+  addLog(`스캔 시작: ${s} ~ ${e} · ${seeds.length}개 키워드`, 'info');
 
   for (let i=0; i<seeds.length; i++) {
     const seed = seeds[i];
     document.getElementById('bar').style.width = Math.round(i/seeds.length*100)+'%';
     document.getElementById('status').textContent = `[${i+1}/${seeds.length}] "${seed}" 수집 중...`;
-    addLog(`▶ "${seed}" 수집 중...`, 'info');
+    addLog(`▶ "${seed}"`, 'info');
     const titles = await fetchTitles(seed, s, e);
     allTitles = allTitles.concat(titles);
     addLog(`✓ ${titles.length}건`, 'ok');
@@ -284,21 +376,17 @@ async function startScan() {
 
   document.getElementById('bar').style.width = '100%';
   document.getElementById('status').textContent = `분석 중... (총 ${allTitles.length}건)`;
-  addLog(`총 ${allTitles.length}건 분석 중...`, 'info');
-
   await new Promise(r=>setTimeout(r,100));
   allKeywords = extractKeywords(allTitles);
-
   document.getElementById('status').textContent = `완료! ${allKeywords.length}개 키워드 추출`;
   document.getElementById('scanBtn').disabled = false;
-
   renderKeywords(allTitles.length);
 }
 
 function renderKeywords(total) {
-  const maxCount = allKeywords[0]?.[1] || 1;
+  const maxCount = allKeywords[0]?.[1]||1;
   document.getElementById('meta').textContent = `기사 ${total}건 분석 · 상위 ${allKeywords.length}개`;
-  document.getElementById('kwGrid').innerHTML = allKeywords.map(([w,c], i) => `
+  document.getElementById('kwGrid').innerHTML = allKeywords.map(([w,c],i) => `
     <div class="kw-item" id="kwitem${i}" onclick="toggleKw(${i},'${w}')">
       <div class="kw-check">✓</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
@@ -317,11 +405,8 @@ function toggleKw(i, word) {
   else { selectedKws.add(word); el.classList.add('selected'); }
 }
 
-function selectAll() {
-  allKeywords.forEach(([w,c],i) => {
-    selectedKws.add(w);
-    document.getElementById('kwitem'+i)?.classList.add('selected');
-  });
+function selectAllKw() {
+  allKeywords.forEach(([w],i) => { selectedKws.add(w); document.getElementById('kwitem'+i)?.classList.add('selected'); });
 }
 
 function goToNewsdesk() {
@@ -341,7 +426,8 @@ function resetAll() {
 }
 
 initDates();
-renderSeeds();
+renderSectors();
+renderPreview();
 </script>
 </body>
 </html>
