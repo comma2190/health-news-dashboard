@@ -33,7 +33,7 @@ input[type=date]:focus { border-color:var(--accent); }
 .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
 
 /* 대분류 선택 */
-.sector-grid { display:grid; grid-template-columns:1fr; gap:0.4rem; margin-bottom:1rem; }
+.sector-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.5rem; margin-bottom:1rem; }
 .sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:left; user-select:none; width:100%; display:flex; justify-content:space-between; align-items:center; }
 .sector-btn:hover { border-color:var(--accent); color:var(--text); }
 .sector-btn.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); color:var(--accent); }
@@ -44,6 +44,9 @@ input[type=date]:focus { border-color:var(--accent); }
 .sector-subs { display:none; flex-wrap:wrap; gap:0.4rem; padding:0.6rem 0 0.2rem; }
 .sector-subs.open { display:flex; }
 .sub-chip { font-size:0.72rem; padding:0.2rem 0.6rem; background:var(--surface2); border:1px solid var(--border); border-radius:100px; color:var(--text2); }
+.sector-sub-area { display:none; flex-wrap:wrap; gap:0.4rem; padding:0.8rem; background:var(--surface2); border-radius:8px; margin-bottom:0.8rem; }
+.sector-sub-area.open { display:flex; }
+.sector-sub-label { font-size:0.72rem; color:var(--text2); width:100%; margin-bottom:0.3rem; }
 .sector-divider { grid-column:1/-1; height:1px; background:var(--border); margin:0.3rem 0; }
 
 /* 진행 */
@@ -98,6 +101,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <div class="card">
   <div class="section-title">대분류 선택</div>
   <div class="sector-grid" id="sectorGrid"></div>
+  <div class="sector-sub-area" id="sectorSubArea"></div>
   <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
     <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="selectAllSectors()">전체 선택</button>
     <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="clearSectors()">전체 해제</button>
@@ -278,20 +282,23 @@ let activeFilter = '전체';
 function renderSectors() {
   const grid = document.getElementById('sectorGrid');
   grid.innerHTML = SECTORS.map((s,i) => {
-    if (s.divider) return '<div class="sector-divider" style="grid-column:1/-1"></div>';
+    if (s.divider) return '<div class="sector-divider"></div>';
     const sel = selectedSectors.has(s.name);
-    const open = openSectors.has(s.name);
-    const seeds = s.seeds || [];
-    return `<div style="grid-column:1/-1">
-      <div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">
-        <span>${s.name}</span>
-        <span class="sector-arrow${open?' open':''}">▼</span>
-      </div>
-      <div class="sector-subs${open?' open':''}">
-        ${seeds.map(sw => `<span class="sub-chip">${sw}</span>`).join('')}
-      </div>
-    </div>`;
+    return `<div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">${s.name}</div>`;
   }).join('');
+
+  // 소분류 표시 영역 업데이트
+  const subArea = document.getElementById('sectorSubArea');
+  const openName = [...openSectors][openSectors.size-1];
+  const openSector = SECTORS.find(s => s.name === openName);
+  if (openSector && openSector.seeds) {
+    subArea.className = 'sector-sub-area open';
+    subArea.innerHTML = `<div class="sector-sub-label">${openSector.name} 검색 키워드</div>` +
+      openSector.seeds.map(sw => `<span class="sub-chip">${sw}</span>`).join('');
+  } else {
+    subArea.className = 'sector-sub-area';
+    subArea.innerHTML = '';
+  }
 }
 
 function toggleSector(name) {
@@ -300,6 +307,7 @@ function toggleSector(name) {
     openSectors.delete(name);
   } else {
     selectedSectors.add(name);
+    openSectors.clear();
     openSectors.add(name);
   }
   renderSectors();
