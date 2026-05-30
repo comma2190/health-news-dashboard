@@ -58,7 +58,7 @@ input:focus, select:focus { border-color:var(--accent); }
 .result-peak { font-size:0.72rem; color:var(--text2); }
 .toggle-icon { color:var(--text2); font-size:0.8rem; transition:transform 0.2s; }
 .toggle-icon.open { transform:rotate(180deg); }
-.chart-wrap { padding:0.8rem 1rem; border-top:1px solid var(--border); background:var(--surface2); }
+.chart-wrap { padding:0.8rem 1rem; border-top:1px solid var(--border); background:var(--surface2); overflow:hidden; }
 .chart-title { font-size:0.72rem; color:var(--text2); margin-bottom:0.8rem; }
 .articles-wrap { display:none; border-top:1px solid var(--border); }
 .articles-wrap.show { display:block; }
@@ -350,7 +350,7 @@ function buildDateChart(articles, startDate, endDate) {
   const [px, py] = pts[peakIdx];
   const peakDot = peakCount > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${peakCount}건</text>` : '';
   const dots = pts.map(([x,y], i) => i === peakIdx || counts[i] === 0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.8"/>`).join('');
-  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:90px">
+  const bars = `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="height:80px;max-width:100%">
 <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c6af7" stop-opacity="0.3"/><stop offset="100%" stop-color="#7c6af7" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#areaGrad)"/>
 <polyline points="${polyline}" fill="none" stroke="#7c6af7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
@@ -380,7 +380,7 @@ function buildSearchChart(datalabData) {
   const [px, py] = pts[peakIdx];
   const peakDate = points[peakIdx].period.slice(5);
   const peakDot = values[peakIdx] > 0 ? `<circle cx="${px}" cy="${py}" r="5" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${px}" y="${py-9}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${peakDate}</text>` : '';
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:90px;overflow:visible">
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:80px;overflow:hidden">
 <defs><linearGradient id="searchGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7a94f" stop-opacity="0.25"/><stop offset="100%" stop-color="#f7a94f" stop-opacity="0.02"/></linearGradient></defs>
 <path d="${areaPath}" fill="url(#searchGrad)"/>
 <path d="${linePath}" fill="none" stroke="#f7a94f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
@@ -538,7 +538,7 @@ ${top20.map((a,i)=>`${i+1}. ${a.title} (${a.dateStr}) - ${a.link}`).join('\n')}
   "civic": "공익 정책 시민단체 관점에서 2~4문장. 제도적·구조적 문제를 날카롭게 짚되 정중하게."
 }`;
 
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://news-api-three.vercel.app/api/briefing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
