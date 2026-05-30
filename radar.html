@@ -33,12 +33,17 @@ input[type=date]:focus { border-color:var(--accent); }
 .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
 
 /* 대분류 선택 */
-.sector-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.5rem; margin-bottom:1rem; }
-.sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:center; user-select:none; }
+.sector-grid { display:grid; grid-template-columns:1fr; gap:0.4rem; margin-bottom:1rem; }
+.sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:left; user-select:none; width:100%; display:flex; justify-content:space-between; align-items:center; }
 .sector-btn:hover { border-color:var(--accent); color:var(--text); }
 .sector-btn.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); color:var(--accent); }
 .sector-btn.highlight { border-color:var(--accent2); color:var(--accent2); }
 .sector-btn.highlight.selected { background:rgba(79,195,247,0.12); }
+.sector-arrow { font-size:0.7rem; transition:transform 0.2s; color:var(--text2); }
+.sector-arrow.open { transform:rotate(180deg); }
+.sector-subs { display:none; flex-wrap:wrap; gap:0.4rem; padding:0.6rem 0 0.2rem; }
+.sector-subs.open { display:flex; }
+.sub-chip { font-size:0.72rem; padding:0.2rem 0.6rem; background:var(--surface2); border:1px solid var(--border); border-radius:100px; color:var(--text2); }
 .sector-divider { grid-column:1/-1; height:1px; background:var(--border); margin:0.3rem 0; }
 
 /* 진행 */
@@ -273,15 +278,30 @@ let activeFilter = '전체';
 function renderSectors() {
   const grid = document.getElementById('sectorGrid');
   grid.innerHTML = SECTORS.map((s,i) => {
-    if (s.divider) return '<div class="sector-divider"></div>';
+    if (s.divider) return '<div class="sector-divider" style="grid-column:1/-1"></div>';
     const sel = selectedSectors.has(s.name);
-    return `<div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">${s.name}</div>`;
+    const open = openSectors.has(s.name);
+    const seeds = s.seeds || [];
+    return `<div style="grid-column:1/-1">
+      <div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">
+        <span>${s.name}</span>
+        <span class="sector-arrow${open?' open':''}">▼</span>
+      </div>
+      <div class="sector-subs${open?' open':''}">
+        ${seeds.map(sw => `<span class="sub-chip">${sw}</span>`).join('')}
+      </div>
+    </div>`;
   }).join('');
 }
 
 function toggleSector(name) {
-  if (selectedSectors.has(name)) selectedSectors.delete(name);
-  else selectedSectors.add(name);
+  if (selectedSectors.has(name)) {
+    selectedSectors.delete(name);
+    openSectors.delete(name);
+  } else {
+    selectedSectors.add(name);
+    openSectors.add(name);
+  }
   renderSectors();
 }
 
