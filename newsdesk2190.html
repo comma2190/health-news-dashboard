@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>보건의료 뉴스 수집기</title>
+<title>뉴스포커스</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 :root {
@@ -128,14 +128,14 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <body>
 <header>
 <div>
-<h1><span class="secret-trigger" id="secretTrigger">보건의료</span> <span>뉴스 수집기</span></h1>
+<h1>보건의료 <span>뉴스 수집기</span></h1>
 <p class="subtitle">네이버 뉴스 검색 API · 날짜 범위 기사 건수 자동 수집</p>
 <p class="subtitle">그래프: <span style="color:#7c6af7">언론게시량(보라)</span> <span style="color:#f7a94f">검색트렌드(오렌지)</span></p>
 </div>
 <div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2)" id="lastRun"></div>
 </header>
 
-<div class="tab-bar" id="tabBar">
+<div class="tab-bar show" id="tabBar">
 <button class="tab-btn active" onclick="switchTab('collect')">수집</button>
 <button class="tab-btn" onclick="switchTab('brief')">브리핑</button>
 </div>
@@ -205,23 +205,7 @@ let holdTimer = null;
 
 const API_BASE = 'https://news-api-three.vercel.app/api/naver';
 
-// 비밀 트리거 — 보건의료 5초 길게 누르기
-const trigger = document.getElementById('secretTrigger');
-trigger.addEventListener('mousedown', startHold);
-trigger.addEventListener('touchstart', startHold, {passive:true});
-trigger.addEventListener('mouseup', cancelHold);
-trigger.addEventListener('mouseleave', cancelHold);
-trigger.addEventListener('touchend', cancelHold);
 
-function startHold(e) {
-  holdTimer = setTimeout(() => {
-    briefUnlocked = true;
-    document.getElementById('tabBar').classList.add('show');
-  }, 5000);
-}
-function cancelHold() {
-  clearTimeout(holdTimer);
-}
 
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
