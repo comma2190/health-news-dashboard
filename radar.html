@@ -34,19 +34,11 @@ input[type=date]:focus { border-color:var(--accent); }
 
 /* 대분류 선택 */
 .sector-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.5rem; margin-bottom:1rem; }
-.sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:left; user-select:none; width:100%; display:flex; justify-content:space-between; align-items:center; }
+.sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:center; user-select:none; }
 .sector-btn:hover { border-color:var(--accent); color:var(--text); }
 .sector-btn.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); color:var(--accent); }
 .sector-btn.highlight { border-color:var(--accent2); color:var(--accent2); }
 .sector-btn.highlight.selected { background:rgba(79,195,247,0.12); }
-.sector-arrow { font-size:0.7rem; transition:transform 0.2s; color:var(--text2); }
-.sector-arrow.open { transform:rotate(180deg); }
-.sector-subs { display:none; flex-wrap:wrap; gap:0.4rem; padding:0.6rem 0 0.2rem; }
-.sector-subs.open { display:flex; }
-.sub-chip { font-size:0.72rem; padding:0.2rem 0.6rem; background:var(--surface2); border:1px solid var(--border); border-radius:100px; color:var(--text2); }
-.sector-sub-area { display:none; flex-wrap:wrap; gap:0.4rem; padding:0.8rem; background:var(--surface2); border-radius:8px; margin-bottom:0.8rem; }
-.sector-sub-area.open { display:flex; }
-.sector-sub-label { font-size:0.72rem; color:var(--text2); width:100%; margin-bottom:0.3rem; }
 .sector-divider { grid-column:1/-1; height:1px; background:var(--border); margin:0.3rem 0; }
 
 /* 진행 */
@@ -101,7 +93,6 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <div class="card">
   <div class="section-title">대분류 선택</div>
   <div class="sector-grid" id="sectorGrid"></div>
-  <div class="sector-sub-area" id="sectorSubArea"></div>
   <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
     <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="selectAllSectors()">전체 선택</button>
     <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="clearSectors()">전체 해제</button>
@@ -161,17 +152,17 @@ const NEWSDESK_URL = 'https://health-news-dashboard.vercel.app/newsdesk2190.html
 
 // 대분류 → 검색 시드 키워드
 const SECTORS = [
-  { name:'보건/의료', seeds:['의료정책','건강보험','공공의료','의료인력','병원','제약','의료기기','감염병','만성질환','희귀질환','정신건강','모성건강','치매','재활'], highlight:true },
-  { name:'복지/돌봄', seeds:['장기요양','장애인복지','기초생활','아동복지','청년복지','다문화'], highlight:true },
+  { name:'보건/의료', seed:'보건의료', highlight:true },
+  { name:'복지/돌봄', seed:'복지 돌봄', highlight:true },
   { divider:true },
-  { name:'정치', seeds:['대통령','국회','선거','외교','국방','북한','지방정치','검찰'] },
-  { name:'경제', seeds:['경기','금융','주식','부동산','대기업','중소기업','고용','수출','소비','에너지','농업'] },
-  { name:'사회', seeds:['교육','환경','재난','법원','경찰','인권','이민','주거','교통'] },
-  { name:'문화/생활', seeds:['문화','음식','여행','패션','종교','출판'] },
-  { name:'국제', seeds:['미국','중국','일본','유럽','동남아','중동','유엔'] },
-  { name:'IT/과학', seeds:['인공지능','모바일','플랫폼','반도체','우주','생명과학','보안'] },
-  { name:'스포츠', seeds:['축구','야구','농구','골프','격투기','올림픽','e스포츠'] },
-  { name:'연예', seeds:['영화','드라마','아이돌','예능','웹툰'] },
+  { name:'정치', seed:'정치' },
+  { name:'경제', seed:'경제' },
+  { name:'사회', seed:'사회' },
+  { name:'문화/생활', seed:'문화 생활' },
+  { name:'국제', seed:'국제' },
+  { name:'IT/과학', seed:'IT 과학기술' },
+  { name:'스포츠', seed:'스포츠' },
+  { name:'연예', seed:'연예' },
 ];
 
 // 소분류 키워드 매핑
@@ -286,30 +277,11 @@ function renderSectors() {
     const sel = selectedSectors.has(s.name);
     return `<div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">${s.name}</div>`;
   }).join('');
-
-  // 소분류 표시 영역 업데이트
-  const subArea = document.getElementById('sectorSubArea');
-  const openName = [...openSectors][openSectors.size-1];
-  const openSector = SECTORS.find(s => s.name === openName);
-  if (openSector && openSector.seeds) {
-    subArea.className = 'sector-sub-area open';
-    subArea.innerHTML = `<div class="sector-sub-label">${openSector.name} 검색 키워드</div>` +
-      openSector.seeds.map(sw => `<span class="sub-chip">${sw}</span>`).join('');
-  } else {
-    subArea.className = 'sector-sub-area';
-    subArea.innerHTML = '';
-  }
 }
 
 function toggleSector(name) {
-  if (selectedSectors.has(name)) {
-    selectedSectors.delete(name);
-    openSectors.delete(name);
-  } else {
-    selectedSectors.add(name);
-    openSectors.clear();
-    openSectors.add(name);
-  }
+  if (selectedSectors.has(name)) selectedSectors.delete(name);
+  else selectedSectors.add(name);
   renderSectors();
 }
 
@@ -416,19 +388,21 @@ async function startScan() {
   document.getElementById('log').innerHTML = '';
   document.getElementById('bar').style.width = '0%';
 
-  const sectors = SECTORS.filter(s=>!s.divider && selectedSectors.has(s.name));
-  const allSeeds = sectors.flatMap(s => s.seeds);
+  const seeds = SECTORS.filter(s=>!s.divider && selectedSectors.has(s.name));
   let allTitles = [];
-  addLog(`스캔 시작: ${s} ~ ${e} · ${sectors.length}개 대분류 · ${allSeeds.length}개 키워드`, 'info');
+  addLog(`스캔 시작: ${s} ~ ${e} · ${seeds.length}개 대분류`, 'info');
 
-  for (let i=0; i<allSeeds.length; i++) {
-    const sw = allSeeds[i];
-    document.getElementById('bar').style.width = Math.round(i/allSeeds.length*100)+'%';
-    document.getElementById('statusText').textContent = `[${i+1}/${allSeeds.length}] "${sw}" 수집 중...`;
-    addLog(`▶ "${sw}"`, 'info');
-    const titles = await fetchTitles(sw, s, e);
-    allTitles = allTitles.concat(titles);
-    addLog(`✓ ${titles.length}건`, 'ok');
+  for (let i=0; i<seeds.length; i++) {
+    const sec = seeds[i];
+    document.getElementById('bar').style.width = Math.round(i/seeds.length*100)+'%';
+    document.getElementById('statusText').textContent = `[${i+1}/${seeds.length}] "${sec.name}" 수집 중...`;
+    const seedWords = sec.seed.split(' ');
+    for (const sw of seedWords) {
+      addLog(`▶ "${sw}"`, 'info');
+      const titles = await fetchTitles(sw, s, e);
+      allTitles = allTitles.concat(titles);
+      addLog(`✓ ${titles.length}건`, 'ok');
+    }
   }
 
   document.getElementById('bar').style.width = '100%';
