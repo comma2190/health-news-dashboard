@@ -134,33 +134,59 @@ header { margin-bottom:2.5rem; padding-bottom:1.2rem; border-bottom:1px solid va
   </div>
 </div>
 
+<!-- 브리핑 모달 -->
+<div id="briefModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;overflow-y:auto;padding:1.5rem">
+  <div style="max-width:700px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--accent)">[ 브리핑 ]</div>
+      <button onclick="closeBriefing()" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
+    </div>
+    <div id="briefAuth" style="text-align:center;padding:2rem 0">
+      <div style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">브리핑 암호를 입력하세요</div>
+      <input type="password" id="briefPw" placeholder="암호" onkeydown="if(event.key==='Enter')checkBriefAuth()"
+        style="width:200px;padding:0.6rem 0.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.85rem;outline:none;text-align:center">
+      <div style="margin-top:0.8rem">
+        <button onclick="checkBriefAuth()" style="padding:0.6rem 1.5rem;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit">입장</button>
+      </div>
+      <div id="briefAuthMsg" style="color:#f76a6a;font-size:0.78rem;margin-top:0.5rem"></div>
+    </div>
+    <div id="briefContent" style="display:none">
+      <div id="briefMeta" style="font-size:0.78rem;color:var(--text2);margin-bottom:1rem;font-family:'JetBrains Mono',monospace"></div>
+      <button onclick="generateBriefing()" id="genBtn"
+        style="width:100%;padding:0.7rem;background:var(--accent);color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:1.2rem">
+        ▶ 브리핑 생성
+      </button>
+      <div id="briefResults"></div>
+      <button onclick="copyAllBriefs()" id="copyAllBtn" style="display:none;width:100%;padding:0.65rem;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:0.83rem;cursor:pointer;font-family:inherit;margin-top:0.8rem">
+        전체 브리핑 복사
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 const GEMINI_KEY = 'AIzaSyBCCz6ne_pqt0fQi3S_gBIvo_z7Ido-PPc';
 
-// 암호 체크
 (function() {
   const ok = sessionStorage.getItem('xi0_auth');
   if (ok !== '0610') window.location.href = '/index.html';
 })();
 
-// 날짜
 const d = new Date();
 document.getElementById('dateEl').textContent =
   d.toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
 
-// 수집 데이터 확인
 const savedResults = sessionStorage.getItem('newsdesk_results');
 const savedDate = sessionStorage.getItem('newsdesk_date');
 if (savedResults) {
   const results = JSON.parse(savedResults);
-  document.getElementById('briefDesc').textContent = `${savedDate} · ${results.length}개 키워드 수집됨 — 클릭해서 브리핑 생성`;
+  document.getElementById('briefDesc').textContent = savedDate + ' · ' + results.length + '개 키워드 수집됨 — 클릭해서 브리핑 생성';
 }
 
 function openBriefing(e) {
-  e.preventDefault();
-  const authOk = sessionStorage.getItem('brief_auth');
+  if (e) e.preventDefault();
   document.getElementById('briefModal').style.display = 'block';
-  if (authOk === '0604') {
+  if (sessionStorage.getItem('brief_auth') === '0604') {
     showBriefContent();
   }
 }
@@ -188,72 +214,66 @@ function showBriefContent() {
     document.getElementById('briefMeta').textContent = '수집된 데이터가 없습니다. 뉴스포커스에서 먼저 수집해주세요.';
     document.getElementById('genBtn').disabled = true;
   } else {
-    document.getElementById('briefMeta').textContent = `${date} · ${results.length}개 키워드`;
+    document.getElementById('briefMeta').textContent = date + ' · ' + results.length + '개 키워드';
   }
 }
 
 async function generateBriefing() {
   const results = JSON.parse(sessionStorage.getItem('newsdesk_results') || '[]');
   if (!results.length) return;
-
   const btn = document.getElementById('genBtn');
   btn.disabled = true; btn.textContent = '생성 중...';
   document.getElementById('briefResults').innerHTML = '';
   document.getElementById('copyAllBtn').style.display = 'none';
-
   const container = document.getElementById('briefResults');
   const briefs = [];
 
   for (const r of results) {
-    if (!r.articles?.length) continue;
+    if (!r.articles || !r.articles.length) continue;
     const top15 = r.articles.slice(0,15);
-    const prompt = `보건의료복지 분야 전문 분석가로서 "${r.text}" 키워드 뉴스를 분석해 브리핑을 작성하세요.
+    const prompt = '보건의료복지 분야 전문 분석가로서 "' + r.text + '" 키워드 뉴스를 분석해 브리핑을 작성하세요.
 
 기사 목록:
-${top15.map((a,i)=>`${i+1}. ${a.title} (${a.dateStr})`).join('
-')}
+' +
+      top15.map(function(a,i){ return (i+1) + '. ' + a.title + ' (' + a.dateStr + ')'; }).join('
+') +
+      '
 
-JSON만 출력하세요:
-{"tag":"긴급|주목|동향","summary":"3~5문장. 정중하지만 직설적이고 날카롭게.","refs":[{"title":"제목1","url":"${top15[0]?.link||''}"},{"title":"제목2","url":"${top15[1]?.link||''}"},{"title":"제목3","url":"${top15[2]?.link||''}"}],"beneficiary":"정책 수혜자 관점 2~4문장.","civic":"정책 시민단체 관점 2~4문장."}`;
+JSON만 출력하세요 (다른 텍스트 없이):
+{"tag":"긴급|주목|동향","summary":"3~5문장. 정중하지만 직설적이고 날카롭게.","refs":[{"title":"제목1","url":"url1"},{"title":"제목2","url":"url2"},{"title":"제목3","url":"url3"}],"beneficiary":"정책 수혜자 관점 2~4문장.","civic":"정책 시민단체 관점 2~4문장."}';
 
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
       });
       const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const text = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]) ? data.candidates[0].content.parts[0].text : '';
       const clean = text.replace(/```json|```/g,'').trim();
       const b = JSON.parse(clean);
-      briefs.push({...b, keyword: r.text, count: r.count});
-
-      const tagColor = {'긴급':'#f76a6a','주목':'#f7a94f','동향':'#7c6af7'}[b.tag]||'#7c6af7';
-      container.innerHTML += `<div style="border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;overflow:hidden">
-        <div style="padding:1rem;border-bottom:1px solid var(--border)">
-          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">
-            <span style="font-weight:700;font-size:0.95rem">${r.text}</span>
-            <span style="font-size:0.68rem;padding:0.2rem 0.5rem;border-radius:100px;background:${tagColor}22;color:${tagColor};border:1px solid ${tagColor}44">${b.tag}</span>
-          </div>
-          <p style="font-size:0.84rem;line-height:1.8;word-break:keep-all">${b.summary}</p>
-        </div>
-        <div style="padding:0.8rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border)">
-          <div style="font-size:0.68rem;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.4rem">참고 기사</div>
-          ${b.refs.map((ref,i)=>`<div style="font-size:0.78rem;padding:0.15rem 0">${i+1}. <a href="${ref.url}" target="_blank" style="color:var(--accent2);text-decoration:none">${ref.title}</a></div>`).join('')}
-        </div>
-        <div style="padding:0.8rem 1rem;border-bottom:1px solid var(--border)">
-          <div style="font-size:0.68rem;font-weight:600;color:#4fc3f7;text-transform:uppercase;margin-bottom:0.4rem">정책 수혜자 관점</div>
-          <p style="font-size:0.83rem;line-height:1.7;word-break:keep-all">${b.beneficiary}</p>
-        </div>
-        <div style="padding:0.8rem 1rem">
-          <div style="font-size:0.68rem;font-weight:600;color:#4caf82;text-transform:uppercase;margin-bottom:0.4rem">정책 시민단체 관점</div>
-          <p style="font-size:0.83rem;line-height:1.7;word-break:keep-all">${b.civic}</p>
-        </div>
-      </div>`;
-    } catch(e) {
-      container.innerHTML += `<div style="padding:0.8rem;color:#f76a6a;font-size:0.82rem">「${r.text}」 생성 실패</div>`;
+      briefs.push(Object.assign({}, b, {keyword: r.text, count: r.count}));
+      const tagColor = {'긴급':'#f76a6a','주목':'#f7a94f','동향':'#7c6af7'}[b.tag] || '#7c6af7';
+      const refs = b.refs || top15.slice(0,3).map(function(a){ return {title:a.title, url:a.link}; });
+      container.innerHTML += '<div style="border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;overflow:hidden">' +
+        '<div style="padding:1rem;border-bottom:1px solid var(--border)">' +
+        '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">' +
+        '<span style="font-weight:700;font-size:0.95rem">' + r.text + '</span>' +
+        '<span style="font-size:0.68rem;padding:0.2rem 0.5rem;border-radius:100px;background:' + tagColor + '22;color:' + tagColor + ';border:1px solid ' + tagColor + '44">' + b.tag + '</span>' +
+        '</div><p style="font-size:0.84rem;line-height:1.8;word-break:keep-all">' + b.summary + '</p></div>' +
+        '<div style="padding:0.8rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border)">' +
+        '<div style="font-size:0.68rem;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.4rem">참고 기사</div>' +
+        refs.map(function(ref,i){ return '<div style="font-size:0.78rem;padding:0.15rem 0">' + (i+1) + '. <a href="' + ref.url + '" target="_blank" style="color:var(--accent2);text-decoration:none">' + ref.title + '</a></div>'; }).join('') +
+        '</div><div style="padding:0.8rem 1rem;border-bottom:1px solid var(--border)">' +
+        '<div style="font-size:0.68rem;font-weight:600;color:#4fc3f7;text-transform:uppercase;margin-bottom:0.4rem">정책 수혜자 관점</div>' +
+        '<p style="font-size:0.83rem;line-height:1.7;word-break:keep-all">' + b.beneficiary + '</p></div>' +
+        '<div style="padding:0.8rem 1rem">' +
+        '<div style="font-size:0.68rem;font-weight:600;color:#4caf82;text-transform:uppercase;margin-bottom:0.4rem">정책 시민단체 관점</div>' +
+        '<p style="font-size:0.83rem;line-height:1.7;word-break:keep-all">' + b.civic + '</p></div></div>';
+    } catch(err) {
+      container.innerHTML += '<div style="padding:0.8rem;color:#f76a6a;font-size:0.82rem">「' + r.text + '」 생성 실패</div>';
     }
-    await new Promise(r=>setTimeout(r,500));
+    await new Promise(function(resolve){ setTimeout(resolve, 500); });
   }
 
   window._briefs = briefs;
@@ -262,30 +282,32 @@ JSON만 출력하세요:
 }
 
 function copyAllBriefs() {
-  if (!window._briefs?.length) return;
-  const text = window._briefs.map(b =>
-    `【${b.keyword}】 [${b.tag}]
+  if (!window._briefs || !window._briefs.length) return;
+  const text = window._briefs.map(function(b) {
+    return '【' + b.keyword + '】 [' + b.tag + ']
 
-${b.summary}
+' + b.summary + '
 
 참고 기사
-${b.refs.map((r,i)=>`${i+1}. ${r.title} ${r.url}`).join('
-')}
+' +
+      (b.refs||[]).map(function(r,i){ return (i+1) + '. ' + r.title + ' ' + r.url; }).join('
+') +
+      '
 
 ▸ 정책 수혜자 관점
-${b.beneficiary}
+' + b.beneficiary + '
 
 ▸ 정책 시민단체 관점
-${b.civic}`
-  ).join('
+' + b.civic;
+  }).join('
 
 ' + '─'.repeat(30) + '
 
 ');
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(text).then(function() {
     const btn = document.getElementById('copyAllBtn');
     btn.textContent = '✓ 복사됨';
-    setTimeout(() => btn.textContent = '전체 브리핑 복사', 2000);
+    setTimeout(function(){ btn.textContent = '전체 브리핑 복사'; }, 2000);
   });
 }
 </script>
