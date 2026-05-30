@@ -2,49 +2,78 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>로그인</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xi0 - WORKPLACE</title>
 <style>
-body{
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
   background:#0f0f13;
   color:white;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
-  font-family:sans-serif;
+  font-family:'Noto Sans KR',sans-serif;
 }
-.box{
-  width:320px;
+.box { width:320px; }
+.title {
+  font-family:'JetBrains Mono',monospace;
+  font-size:1.1rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  color:#8888a8;
+  text-align:center;
+  margin-bottom:2rem;
 }
-input{
+.title span { color:#7c6af7; }
+input {
   width:100%;
-  padding:12px;
+  padding:12px 14px;
   margin-bottom:10px;
+  background:#1e1e28;
+  border:1px solid #2a2a38;
+  border-radius:8px;
+  color:white;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.9rem;
+  outline:none;
+  transition:border-color 0.2s;
 }
-button{
+input:focus { border-color:#7c6af7; }
+button {
   width:100%;
   padding:12px;
+  background:#7c6af7;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.9rem;
+  font-weight:500;
+  cursor:pointer;
+  transition:background 0.2s;
 }
+button:hover { background:#6a58e8; }
+#msg { font-size:0.8rem; color:#f76a6a; margin-top:0.5rem; text-align:center; }
 </style>
 </head>
 <body>
 <div class="box">
-<h2>암구호</h2>
-<input type="password" id="pw">
-<button onclick="login()">입장</button>
-<p id="msg"></p>
+  <div class="title">[ <span>Xi0</span> - WORKPLACE ]</div>
+  <input type="password" id="pw" placeholder="암호" onkeydown="if(event.key==='Enter')login()">
+  <button onclick="login()">입장</button>
+  <p id="msg"></p>
 </div>
 
 <script>
 async function login(){
   const password=document.getElementById('pw').value;
-
   const res=await fetch('/api/login',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({password})
   });
-
   if(res.ok){
     location.href='/newsdesk2190.html';
   }else{
