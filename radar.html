@@ -11,7 +11,6 @@
   --border:#2a2a38; --accent:#7c6af7; --accent2:#4fc3f7;
   --text:#e8e8f0; --text2:#8888a8;
   --success:#4caf82; --warning:#f7a94f; --error:#f76a6a;
-  --highlight:#4fc3f7;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding:1.2rem; }
@@ -22,12 +21,8 @@ h1 span { color:var(--accent); }
 .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin-bottom:1.2rem; }
 .section-title { font-size:0.75rem; font-weight:600; color:var(--text2); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
 label { display:block; font-size:0.72rem; color:var(--text2); margin-bottom:0.4rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
-input[type=date], input[type=text] {
-  width:100%; background:var(--surface2); border:1px solid var(--border);
-  border-radius:8px; padding:0.6rem 0.8rem; color:var(--text);
-  font-family:'JetBrains Mono',monospace; font-size:0.85rem; outline:none; transition:border-color 0.2s;
-}
-input:focus { border-color:var(--accent); }
+input[type=date] { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.8rem; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.85rem; outline:none; transition:border-color 0.2s; }
+input[type=date]:focus { border-color:var(--accent); }
 .controls { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
 .btn { padding:0.65rem 1.2rem; border-radius:8px; border:none; font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; text-align:center; }
 .btn-primary { background:var(--accent); color:white; }
@@ -36,49 +31,38 @@ input:focus { border-color:var(--accent); }
 .btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
 .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
 
-/* 섹터 선택 UI */
-.sector-group { margin-bottom:0.5rem; }
-.sector-group.highlight .sector-header { border-color:var(--highlight); background:rgba(79,195,247,0.06); }
-.sector-group.highlight .sector-name { color:var(--highlight); }
-.sector-divider { height:1px; background:var(--border); margin:1rem 0; }
-.sector-header { display:flex; align-items:center; justify-content:space-between; padding:0.65rem 0.9rem; background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:all 0.15s; user-select:none; }
-.sector-header:hover { border-color:var(--accent); }
-.sector-header.all-selected { border-color:var(--accent); background:rgba(124,106,247,0.1); }
-.sector-name { font-size:0.88rem; font-weight:600; }
-.sector-meta { display:flex; align-items:center; gap:0.5rem; }
-.sector-count { font-size:0.72rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
-.sector-toggle { font-size:0.72rem; color:var(--accent); font-weight:600; }
-.sector-body { display:none; padding:0.6rem 0.3rem 0.3rem; flex-wrap:wrap; gap:0.4rem; }
-.sector-body.open { display:flex; }
-.sub-tag { display:inline-flex; align-items:center; padding:0.3rem 0.7rem; border-radius:6px; font-size:0.8rem; background:var(--surface2); border:1px solid var(--border); cursor:pointer; transition:all 0.15s; user-select:none; }
-.sub-tag:hover { border-color:var(--accent); }
-.sub-tag.selected { background:rgba(124,106,247,0.12); border-color:var(--accent); color:var(--accent); }
-.sector-group.highlight .sub-tag.selected { background:rgba(79,195,247,0.1); border-color:var(--highlight); color:var(--highlight); }
+/* 대분류 선택 */
+.sector-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.5rem; margin-bottom:1rem; }
+.sector-btn { padding:0.6rem 0.8rem; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.15s; text-align:center; user-select:none; }
+.sector-btn:hover { border-color:var(--accent); color:var(--text); }
+.sector-btn.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); color:var(--accent); }
+.sector-btn.highlight { border-color:var(--accent2); color:var(--accent2); }
+.sector-btn.highlight.selected { background:rgba(79,195,247,0.12); }
+.sector-divider { grid-column:1/-1; height:1px; background:var(--border); margin:0.3rem 0; }
 
-.selected-preview { display:flex; flex-wrap:wrap; gap:0.4rem; min-height:32px; margin-bottom:0.8rem; }
-.preview-tag { display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.6rem; border-radius:5px; font-size:0.78rem; background:rgba(124,106,247,0.12); border:1px solid var(--accent); color:var(--accent); }
-.preview-tag span { cursor:pointer; color:var(--text2); }
-.preview-tag span:hover { color:var(--error); }
-.preview-empty { font-size:0.82rem; color:var(--text2); padding:0.3rem 0; }
-
-.add-row { display:flex; gap:0.5rem; padding-top:0.8rem; border-top:1px solid var(--border); margin-top:0.8rem; }
-.add-row input { flex:1; min-width:0; }
-
+/* 진행 */
 .progress-wrap { display:none; }
 .progress-wrap.show { display:block; }
 .bar-bg { background:var(--surface2); border-radius:100px; height:6px; margin:0.8rem 0; overflow:hidden; }
 .bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:100px; transition:width 0.4s; width:0%; }
-.status { font-size:0.8rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+.status-text { font-size:0.8rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
 .log { background:var(--surface2); border-radius:8px; padding:0.8rem; margin-top:0.8rem; max-height:120px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.8; }
 .ok { color:var(--success); } .err { color:var(--error); } .info { color:var(--text2); }
 
+/* 결과 */
 .results-wrap { display:none; }
 .results-wrap.show { display:block; }
-.kw-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.6rem; }
+.filter-bar { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem; }
+.filter-btn { padding:0.3rem 0.8rem; border-radius:100px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); font-size:0.78rem; cursor:pointer; transition:all 0.15s; }
+.filter-btn:hover { border-color:var(--accent); }
+.filter-btn.active { background:var(--accent); border-color:var(--accent); color:white; }
+.kw-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:0.6rem; }
 .kw-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:0.8rem 1rem; cursor:pointer; transition:all 0.2s; position:relative; }
 .kw-item:hover { border-color:var(--accent); background:rgba(124,106,247,0.08); transform:translateY(-1px); }
 .kw-item.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); }
-.kw-word { font-size:0.95rem; font-weight:600; margin-bottom:0.3rem; }
+.kw-item.hidden { display:none; }
+.kw-word { font-size:0.92rem; font-weight:600; margin-bottom:0.3rem; }
+.kw-sub { font-size:0.7rem; color:var(--text2); margin-bottom:0.3rem; }
 .kw-count { font-size:0.72rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
 .kw-bar { height:3px; background:var(--border); border-radius:2px; margin-top:0.5rem; overflow:hidden; }
 .kw-bar-fill { height:100%; background:var(--accent); border-radius:2px; }
@@ -86,7 +70,6 @@ input:focus { border-color:var(--accent); }
 .kw-item.selected .kw-check { display:flex; }
 .action-row { display:flex; gap:0.6rem; margin-top:1rem; flex-wrap:wrap; }
 .action-row .btn { flex:1; min-width:140px; }
-.section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
 
 input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
 ::-webkit-scrollbar { width:4px; }
@@ -95,28 +78,23 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
   body { padding:0.8rem; }
   h1 { font-size:1.1rem; }
   .controls { grid-template-columns:1fr; }
-  .kw-grid { grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
+  .sector-grid { grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
+  .kw-grid { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); }
 }
 </style>
 </head>
 <body>
 <header>
   <h1>이슈 <span>레이더</span></h1>
-  <p class="subtitle">섹터 선택 → 뉴스 수집 → 빈도 높은 이슈 추출 → newsdesk 정밀 수집</p>
+  <p class="subtitle">대분류 선택 → 수집 → 소분류별 이슈 추출 → newsdesk 정밀 수집</p>
 </header>
 
 <div class="card">
-  <div class="section-title">섹터 선택</div>
-  <div id="sectorList"></div>
-
-  <div class="add-row">
-    <input type="text" id="newSeed" placeholder="직접 키워드 추가..." onkeydown="if(event.key==='Enter'&&!event.isComposing)addCustom()">
-    <button class="btn btn-secondary" onclick="addCustom()">+ 추가</button>
-  </div>
-
-  <div style="margin-top:1rem">
-    <div style="font-size:0.72rem;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.5rem">선택된 키워드 (<span id="selectedCount">0</span>개)</div>
-    <div class="selected-preview" id="selectedPreview"><span class="preview-empty">선택된 키워드가 없습니다</span></div>
+  <div class="section-title">대분류 선택</div>
+  <div class="sector-grid" id="sectorGrid"></div>
+  <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+    <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="selectAllSectors()">전체 선택</button>
+    <button class="btn btn-secondary" style="flex:1;font-size:0.8rem;padding:0.5rem" onclick="clearSectors()">전체 해제</button>
   </div>
 </div>
 
@@ -135,16 +113,17 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <div class="card progress-wrap" id="progressWrap">
   <div class="section-title">수집 중...</div>
   <div class="bar-bg"><div class="bar" id="bar"></div></div>
-  <div class="status" id="status">준비 중...</div>
+  <div class="status-text" id="statusText">준비 중...</div>
   <div class="log" id="log"></div>
 </div>
 
 <div class="results-wrap" id="resultsWrap">
   <div class="card">
-    <div class="section-header">
-      <span class="section-title">주요 이슈 키워드</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem">
+      <span class="section-title" style="margin-bottom:0">주요 이슈</span>
       <span style="font-size:0.78rem;color:var(--text2)" id="meta"></span>
     </div>
+    <div class="filter-bar" id="filterBar"></div>
     <div class="kw-grid" id="kwGrid"></div>
     <div class="action-row">
       <button class="btn btn-secondary" onclick="selectAllKw()">전체 선택</button>
@@ -166,129 +145,151 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
     }
   }
 })();
-</script>
-<script>
+
+const API_BASE = 'https://news-api-three.vercel.app/api/naver';
 const NEWSDESK_URL = 'https://health-news-dashboard.vercel.app/newsdesk2190.html';
 
+// 대분류 → 검색 시드 키워드
 const SECTORS = [
-  {
-    name: '보건/의료', highlight: true,
-    subs: ['의료정책/제도','건강보험','공공의료','의료인력','병원/의원','제약/신약','의료기기','감염병/방역','만성질환','희귀질환','정신건강','여성/모성건강','노인건강/치매','재활/한의학']
-  },
-  {
-    name: '복지/돌봄', highlight: true,
-    subs: ['노인돌봄/장기요양','장애인복지','기초생활/빈곤','아동복지','청년복지','가족/다문화']
-  },
-  { divider: true },
-  {
-    name: '정치',
-    subs: ['대통령/청와대','국회/입법','선거/정당','외교','안보/국방','북한','지방정치','사법/헌법']
-  },
-  {
-    name: '경제',
-    subs: ['거시경제/경기','금융/은행','증권/주식','부동산','대기업/재벌','중소기업/스타트업','노동/고용','무역/수출','소비/유통','에너지/자원','농업/수산']
-  },
-  {
-    name: '사회',
-    subs: ['교육/입시','환경/기후','재난/안전','법원/판결','경찰/범죄','인권/젠더','이민/다문화','주거/도시','교통']
-  },
-  {
-    name: '문화/생활',
-    subs: ['문화/예술','음식/요리','여행/관광','패션/뷰티','종교','언어/출판']
-  },
-  {
-    name: '국제',
-    subs: ['미국','중국','일본','유럽','동남아','중동/아프리카','국제기구/UN']
-  },
-  {
-    name: 'IT/과학',
-    subs: ['AI/로봇','모바일/통신','인터넷/플랫폼','반도체/하드웨어','우주/천문','생명과학','보안/해킹']
-  },
-  {
-    name: '스포츠',
-    subs: ['축구','야구','농구/배구','골프','격투기','올림픽/국제대회','e스포츠']
-  },
-  {
-    name: '연예',
-    subs: ['영화','드라마','음악/아이돌','방송/예능','웹툰/게임']
-  },
+  { name:'보건/의료', seed:'보건의료', highlight:true },
+  { name:'복지/돌봄', seed:'복지 돌봄', highlight:true },
+  { divider:true },
+  { name:'정치', seed:'정치' },
+  { name:'경제', seed:'경제' },
+  { name:'사회', seed:'사회' },
+  { name:'문화/생활', seed:'문화 생활' },
+  { name:'국제', seed:'국제' },
+  { name:'IT/과학', seed:'IT 과학기술' },
+  { name:'스포츠', seed:'스포츠' },
+  { name:'연예', seed:'연예' },
 ];
 
-const STOPWORDS = new Set(['이','그','저','것','수','등','및','또','더','이미','이후','이전','현재','이번','지난','오늘','내일','어제','올해','관련','대한','위한','통한','따른','있는','없는','하는','되는','이는','하고','있다','없다','한다','된다','했다','됐다','라고','에서','으로','까지','부터','에게','정도','경우','문제','상황','필요','가능','지원','진행','추진','계획','발표','강조','제시','검토','마련','실시','시행','도입','개선','확대','강화','운영','관리','제공','위해','통해','대해','따라','뒤','앞','속','안','밖','것이','것을','것은','하여','하며','하면','하지','하기','이다','이며','이고','이나','이에','이를','년','월','일','시','분','초','개','명','건','원','만','억','번','회','및','또한','특히','다만','그러나','하지만','그런데','그래서','따라서','왜냐하면','물론','사실','결국','이처럼','이러한','이런','저런','뉴스','기사','보도','언론','기자','취재','발언','입장']);
+// 소분류 키워드 매핑
+const SUB_MAP = {
+  '의료정책/제도': ['의료정책','의료제도','의료법','의료개혁','보건정책','의료수가','비급여','급여화'],
+  '건강보험': ['건강보험','건보','보험료','건강보험공단','급여','본인부담','보장성'],
+  '공공의료': ['공공의료','공공병원','지방의료원','국립병원','의료원','공공보건'],
+  '의료인력': ['의사','간호사','간호','의대','의료인','전공의','인턴','레지던트','의사파업','의사협회','간호법','PA'],
+  '병원/의원': ['병원','의원','종합병원','응급실','폐업','개원','병원비','의료기관'],
+  '제약/신약': ['제약','신약','약값','약품','바이오','임상','FDA','허가','의약품'],
+  '의료기기': ['의료기기','의료장비','디지털헬스','원격의료','의료AI'],
+  '감염병/방역': ['감염','방역','코로나','독감','결핵','바이러스','전염','백신','예방접종'],
+  '만성질환': ['암','당뇨','고혈압','심장','뇌졸중','비만','치료','만성','성인병'],
+  '희귀질환': ['희귀질환','희귀병','난치','유전자','소아암'],
+  '정신건강': ['정신건강','우울','자살','정신과','트라우마','스트레스','번아웃','ADHD'],
+  '여성/모성건강': ['출산','임신','산모','모성','여성건강','산부인과','불임','저출생'],
+  '노인건강/치매': ['치매','노인건강','노인의료','노인병','고령','실버'],
+  '재활/한의학': ['재활','한의','한방','침술','물리치료','작업치료'],
+  '노인돌봄/장기요양': ['장기요양','요양원','요양병원','노인돌봄','재가','돌봄','노인복지'],
+  '장애인복지': ['장애인','장애','활동지원','장애등급','발달장애','중증장애'],
+  '기초생활/빈곤': ['기초생활','수급자','빈곤','기초수급','생계급여','의료급여'],
+  '아동복지': ['아동복지','아동학대','보육','어린이집','유치원','아동','돌봄'],
+  '청년복지': ['청년','청년지원','청년수당','취업','청년주거'],
+  '가족/다문화': ['다문화','가족','한부모','이혼','입양'],
+  '대통령/청와대': ['대통령','청와대','대통령실','국정','국무회의'],
+  '국회/입법': ['국회','의원','법안','입법','상임위','본회의','여야'],
+  '선거/정당': ['선거','정당','민주당','국민의힘','공천','총선','대선'],
+  '외교': ['외교','정상회담','외무','대사관','조약'],
+  '안보/국방': ['국방','군','안보','軍','병사','군인','방위'],
+  '북한': ['북한','김정은','평양','핵','미사일','남북'],
+  '지방정치': ['시장','도지사','구청장','지방','광역','기초의원'],
+  '사법/헌법': ['헌법','대법원','헌법재판소','검찰','수사','판결','재판'],
+  '거시경제/경기': ['GDP','경기','경제성장','물가','인플레','금리','환율'],
+  '금융/은행': ['금융','은행','금리','대출','예금','이자','한국은행'],
+  '증권/주식': ['주식','코스피','코스닥','증시','펀드','ETF'],
+  '부동산': ['부동산','아파트','집값','전세','월세','청약','재건축'],
+  '대기업/재벌': ['삼성','현대','SK','LG','재벌','대기업','회장'],
+  '중소기업/스타트업': ['중소기업','스타트업','벤처','창업','소상공인'],
+  '노동/고용': ['노동','고용','임금','최저임금','실업','취업','근로','노조'],
+  '무역/수출': ['수출','수입','무역','관세','통상','FTA'],
+  '소비/유통': ['소비','유통','물가','마트','쇼핑','소매'],
+  '에너지/자원': ['에너지','원전','재생에너지','태양광','전기요금'],
+  '농업/수산': ['농업','농민','수산','어업','농산물','식품'],
+  '교육/입시': ['교육','입시','수능','대학','학교','교사','학생'],
+  '환경/기후': ['환경','기후','온난화','탄소','미세먼지','쓰레기'],
+  '재난/안전': ['재난','화재','홍수','지진','태풍','안전','사고'],
+  '법원/판결': ['법원','판결','재판','소송','형사','민사'],
+  '경찰/범죄': ['경찰','범죄','살인','강도','사기','마약'],
+  '인권/젠더': ['인권','젠더','성차별','페미','여성','성소수자'],
+  '이민/다문화': ['이민','외국인','난민','다문화','이주'],
+  '주거/도시': ['주거','도시','재개발','도시재생','신도시'],
+  '교통': ['교통','도로','철도','지하철','버스','항공'],
+  '문화/예술': ['문화','예술','공연','전시','미술','음악'],
+  '음식/요리': ['음식','요리','맛집','식당','요식업'],
+  '여행/관광': ['여행','관광','호텔','항공','해외여행'],
+  '패션/뷰티': ['패션','뷰티','화장품','의류','트렌드'],
+  '종교': ['종교','교회','사찰','불교','기독교','천주교'],
+  '언어/출판': ['출판','도서','책','언어','번역'],
+  '미국': ['미국','트럼프','바이든','워싱턴','미중'],
+  '중국': ['중국','시진핑','베이징','중국경제'],
+  '일본': ['일본','기시다','도쿄','한일'],
+  '유럽': ['유럽','EU','영국','독일','프랑스'],
+  '동남아': ['동남아','베트남','태국','인도네시아','필리핀'],
+  '중동/아프리카': ['중동','이스라엘','이란','아프리카','팔레스타인'],
+  '국제기구/UN': ['유엔','UN','WHO','IMF','세계은행'],
+  'AI/로봇': ['AI','인공지능','챗GPT','로봇','자율주행','머신러닝'],
+  '모바일/통신': ['모바일','스마트폰','5G','통신','아이폰','갤럭시'],
+  '인터넷/플랫폼': ['플랫폼','네이버','카카오','유튜브','인스타','SNS'],
+  '반도체/하드웨어': ['반도체','메모리','GPU','CPU','삼성전자','SK하이닉스'],
+  '우주/천문': ['우주','NASA','로켓','위성','천문'],
+  '생명과학': ['생명과학','바이오','유전자','줄기세포','mRNA'],
+  '보안/해킹': ['해킹','보안','사이버','개인정보','랜섬웨어'],
+  '축구': ['축구','월드컵','K리그','손흥민','대표팀'],
+  '야구': ['야구','KBO','MLB','투수','타자'],
+  '농구/배구': ['농구','배구','KBL','국가대표'],
+  '골프': ['골프','PGA','LPGA','골프장'],
+  '격투기': ['격투기','UFC','복싱','태권도'],
+  '올림픽/국제대회': ['올림픽','아시안게임','세계선수권'],
+  'e스포츠': ['e스포츠','게임','리그오브레전드','LOL'],
+  '영화': ['영화','박스오피스','개봉','감독','배우'],
+  '드라마': ['드라마','시청률','넷플릭스','OTT'],
+  '음악/아이돌': ['아이돌','K팝','음원','콘서트','BTS'],
+  '방송/예능': ['예능','방송','프로그램','MC','시청률'],
+  '웹툰/게임': ['웹툰','게임','출시','넥슨','엔씨'],
+};
 
-let selectedSubs = new Set();
-let customSeeds = [];
+// 대분류 → 소분류 매핑
+const SECTOR_SUBS = {
+  '보건/의료': ['의료정책/제도','건강보험','공공의료','의료인력','병원/의원','제약/신약','의료기기','감염병/방역','만성질환','희귀질환','정신건강','여성/모성건강','노인건강/치매','재활/한의학'],
+  '복지/돌봄': ['노인돌봄/장기요양','장애인복지','기초생활/빈곤','아동복지','청년복지','가족/다문화'],
+  '정치': ['대통령/청와대','국회/입법','선거/정당','외교','안보/국방','북한','지방정치','사법/헌법'],
+  '경제': ['거시경제/경기','금융/은행','증권/주식','부동산','대기업/재벌','중소기업/스타트업','노동/고용','무역/수출','소비/유통','에너지/자원','농업/수산'],
+  '사회': ['교육/입시','환경/기후','재난/안전','법원/판결','경찰/범죄','인권/젠더','이민/다문화','주거/도시','교통'],
+  '문화/생활': ['문화/예술','음식/요리','여행/관광','패션/뷰티','종교','언어/출판'],
+  '국제': ['미국','중국','일본','유럽','동남아','중동/아프리카','국제기구/UN'],
+  'IT/과학': ['AI/로봇','모바일/통신','인터넷/플랫폼','반도체/하드웨어','우주/천문','생명과학','보안/해킹'],
+  '스포츠': ['축구','야구','농구/배구','골프','격투기','올림픽/국제대회','e스포츠'],
+  '연예': ['영화','드라마','음악/아이돌','방송/예능','웹툰/게임'],
+};
+
+const STOPWORDS = new Set(['이','그','저','것','수','등','및','또','더','이미','이후','이전','현재','이번','지난','오늘','내일','어제','올해','관련','대한','위한','통한','따른','있는','없는','하는','되는','이는','하고','있다','없다','한다','된다','했다','됐다','라고','에서','으로','까지','부터','에게','정도','경우','문제','상황','필요','가능','지원','진행','추진','계획','발표','강조','제시','검토','마련','실시','시행','도입','개선','확대','강화','운영','관리','제공','위해','통해','대해','따라','뒤','앞','속','안','밖','것이','것을','것은','하여','하며','하면','하지','하기','이다','이며','이고','이나','이에','이를','년','월','일','시','분','초','개','명','건','원','만','억','번','회','및','또한','특히','다만','그러나','하지만','그런데','그래서','따라서','물론','사실','결국','이처럼','이러한','이런','저런','뉴스','기사','보도','언론','기자','취재','발언','입장']);
+
+let selectedSectors = new Set();
 let allKeywords = [];
 let selectedKws = new Set();
-let openSectors = new Set();
+let activeFilter = '전체';
 
 function renderSectors() {
-  const container = document.getElementById('sectorList');
-  container.innerHTML = SECTORS.map((s, si) => {
-    if (s.divider) return `<div class="sector-divider"></div>`;
-    const allSel = s.subs.every(sub => selectedSubs.has(sub));
-    const someSel = s.subs.some(sub => selectedSubs.has(sub));
-    const isOpen = openSectors.has(si);
-    const selCount = s.subs.filter(sub => selectedSubs.has(sub)).length;
-    return `<div class="sector-group${s.highlight?' highlight':''}">
-      <div class="sector-header${allSel?' all-selected':''}" onclick="toggleSector(${si})">
-        <span class="sector-name">${s.name}</span>
-        <div class="sector-meta">
-          ${someSel ? `<span class="sector-count">${selCount}/${s.subs.length}</span>` : `<span class="sector-count">${s.subs.length}개</span>`}
-          <span class="sector-toggle" onclick="event.stopPropagation();toggleAllSubs(${si})">${allSel?'전체해제':'전체선택'}</span>
-          <span style="color:var(--text2);font-size:0.75rem">${isOpen?'▲':'▼'}</span>
-        </div>
-      </div>
-      <div class="sector-body${isOpen?' open':''}" id="sectorBody${si}">
-        ${s.subs.map(sub => `<div class="sub-tag${selectedSubs.has(sub)?' selected':''}" onclick="toggleSub('${sub}',${si})">${sub}</div>`).join('')}
-      </div>
-    </div>`;
+  const grid = document.getElementById('sectorGrid');
+  grid.innerHTML = SECTORS.map((s,i) => {
+    if (s.divider) return '<div class="sector-divider"></div>';
+    const sel = selectedSectors.has(s.name);
+    return `<div class="sector-btn${s.highlight?' highlight':''}${sel?' selected':''}" onclick="toggleSector('${s.name}')">${s.name}</div>`;
   }).join('');
 }
 
-function toggleSector(si) {
-  if (openSectors.has(si)) openSectors.delete(si);
-  else openSectors.add(si);
+function toggleSector(name) {
+  if (selectedSectors.has(name)) selectedSectors.delete(name);
+  else selectedSectors.add(name);
   renderSectors();
 }
 
-function toggleAllSubs(si) {
-  const s = SECTORS[si];
-  const allSel = s.subs.every(sub => selectedSubs.has(sub));
-  s.subs.forEach(sub => allSel ? selectedSubs.delete(sub) : selectedSubs.add(sub));
+function selectAllSectors() {
+  SECTORS.filter(s=>!s.divider).forEach(s=>selectedSectors.add(s.name));
   renderSectors();
-  renderPreview();
 }
 
-function toggleSub(sub, si) {
-  if (selectedSubs.has(sub)) selectedSubs.delete(sub);
-  else selectedSubs.add(sub);
-  renderSectors();
-  renderPreview();
-}
-
-function renderPreview() {
-  const all = [...selectedSubs, ...customSeeds];
-  document.getElementById('selectedCount').textContent = all.length;
-  const el = document.getElementById('selectedPreview');
-  if (!all.length) { el.innerHTML = '<span class="preview-empty">선택된 키워드가 없습니다</span>'; return; }
-  el.innerHTML = all.map(k => `<div class="preview-tag">${k}<span onclick="removeFromPreview('${k}')">×</span></div>`).join('');
-}
-
-function removeFromPreview(k) {
-  selectedSubs.delete(k);
-  customSeeds = customSeeds.filter(s => s !== k);
-  renderSectors();
-  renderPreview();
-}
-
-function addCustom() {
-  const v = document.getElementById('newSeed').value.trim();
-  if (!v || customSeeds.includes(v) || selectedSubs.has(v)) return;
-  customSeeds.push(v);
-  document.getElementById('newSeed').value = '';
-  renderPreview();
-}
+function clearSectors() { selectedSectors.clear(); renderSectors(); }
 
 function initDates() {
   const today = new Date().toISOString().split('T')[0];
@@ -303,26 +304,22 @@ function addLog(msg, type='info') {
   log.appendChild(el); log.scrollTop = log.scrollHeight;
 }
 
-function splitDateRange(startDate, endDate) {
-  const ranges = [];
-  let cur = new Date(startDate);
-  const end = new Date(endDate);
+function splitDateRange(s, e) {
+  const ranges = []; let cur = new Date(s); const end = new Date(e);
   while (cur <= end) {
     const from = cur.toISOString().split('T')[0];
     const to = new Date(Math.min(cur.getTime()+4*86400000, end.getTime())).toISOString().split('T')[0];
-    ranges.push({ from, to });
-    cur = new Date(cur.getTime()+5*86400000);
+    ranges.push({from,to}); cur = new Date(cur.getTime()+5*86400000);
   }
   return ranges;
 }
 
-async function fetchTitles(keyword, startDate, endDate) {
-  const ranges = splitDateRange(startDate, endDate);
-  let titles = [];
-  const seen = new Set();
-  for (const { from, to } of ranges) {
-    let idx = 1, reached = false;
-    while (!reached && idx <= 1000) {
+async function fetchTitles(keyword, s, e) {
+  const ranges = splitDateRange(s, e);
+  let titles = []; const seen = new Set();
+  for (const {from,to} of ranges) {
+    let idx=1, reached=false;
+    while (!reached && idx<=1000) {
       try {
         const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent(keyword)}&start=${idx}`);
         if (!res.ok) break;
@@ -331,13 +328,12 @@ async function fetchTitles(keyword, startDate, endDate) {
         for (const item of data.items) {
           const pub = new Date(item.pubDate).getTime();
           if (pub > new Date(to+'T23:59:59').getTime()) continue;
-          if (pub < new Date(from).getTime()) { reached = true; break; }
+          if (pub < new Date(from).getTime()) { reached=true; break; }
           const title = item.title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
           if (!seen.has(title)) { seen.add(title); titles.push(title); }
         }
-        if (data.items.length < 100) break;
-        idx += 100;
-        await new Promise(r=>setTimeout(r,150));
+        if (data.items.length<100) break;
+        idx+=100; await new Promise(r=>setTimeout(r,150));
       } catch(e) { break; }
     }
     await new Promise(r=>setTimeout(r,100));
@@ -345,24 +341,42 @@ async function fetchTitles(keyword, startDate, endDate) {
   return titles;
 }
 
+function classifySub(word) {
+  for (const [sub, kws] of Object.entries(SUB_MAP)) {
+    if (kws.some(k => word.includes(k) || k.includes(word))) return sub;
+  }
+  return null;
+}
+
+function getSectorForSub(sub) {
+  for (const [sector, subs] of Object.entries(SECTOR_SUBS)) {
+    if (subs.includes(sub)) return sector;
+  }
+  return '기타';
+}
+
 function extractKeywords(titles) {
   const freq = {};
   for (const title of titles) {
     const words = title.replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>=2);
     for (const w of words) {
-      const isKorean = /^[\uAC00-\uD7A3]{2,5}$/.test(w);
+      const isKorean = /^[\uAC00-\uD7A3]{2,6}$/.test(w);
       const isEnglish = /^[a-zA-Z]{3,}$/.test(w);
       if (!isKorean && !isEnglish) continue;
       if (STOPWORDS.has(w)) continue;
       freq[w] = (freq[w]||0)+1;
     }
   }
-  return Object.entries(freq).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  return Object.entries(freq).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,60)
+    .map(([w,c]) => {
+      const sub = classifySub(w);
+      const sector = sub ? getSectorForSub(sub) : '기타';
+      return { word:w, count:c, sub: sub||'미분류', sector };
+    });
 }
 
 async function startScan() {
-  const seeds = [...selectedSubs, ...customSeeds];
-  if (!seeds.length) { alert('키워드를 선택해주세요'); return; }
+  if (!selectedSectors.size) { alert('대분류를 선택해주세요'); return; }
   const s = document.getElementById('startDate').value;
   const e = document.getElementById('endDate').value;
   if (!s||!e) { alert('날짜를 입력해주세요'); return; }
@@ -373,52 +387,81 @@ async function startScan() {
   document.getElementById('log').innerHTML = '';
   document.getElementById('bar').style.width = '0%';
 
+  const seeds = SECTORS.filter(s=>!s.divider && selectedSectors.has(s.name));
   let allTitles = [];
-  addLog(`스캔 시작: ${s} ~ ${e} · ${seeds.length}개 키워드`, 'info');
+  addLog(`스캔 시작: ${s} ~ ${e} · ${seeds.length}개 대분류`, 'info');
 
   for (let i=0; i<seeds.length; i++) {
-    const seed = seeds[i];
+    const sec = seeds[i];
     document.getElementById('bar').style.width = Math.round(i/seeds.length*100)+'%';
-    document.getElementById('status').textContent = `[${i+1}/${seeds.length}] "${seed}" 수집 중...`;
-    addLog(`▶ "${seed}"`, 'info');
-    const titles = await fetchTitles(seed, s, e);
-    allTitles = allTitles.concat(titles);
-    addLog(`✓ ${titles.length}건`, 'ok');
+    document.getElementById('statusText').textContent = `[${i+1}/${seeds.length}] "${sec.name}" 수집 중...`;
+    const seedWords = sec.seed.split(' ');
+    for (const sw of seedWords) {
+      addLog(`▶ "${sw}"`, 'info');
+      const titles = await fetchTitles(sw, s, e);
+      allTitles = allTitles.concat(titles);
+      addLog(`✓ ${titles.length}건`, 'ok');
+    }
   }
 
   document.getElementById('bar').style.width = '100%';
-  document.getElementById('status').textContent = `분석 중... (총 ${allTitles.length}건)`;
+  document.getElementById('statusText').textContent = `분석 중... (총 ${allTitles.length}건)`;
   await new Promise(r=>setTimeout(r,100));
   allKeywords = extractKeywords(allTitles);
-  document.getElementById('status').textContent = `완료! ${allKeywords.length}개 키워드 추출`;
+  document.getElementById('statusText').textContent = `완료! ${allKeywords.length}개 키워드 추출`;
   document.getElementById('scanBtn').disabled = false;
-  renderKeywords(allTitles.length);
+  renderResults(allTitles.length);
 }
 
-function renderKeywords(total) {
-  const maxCount = allKeywords[0]?.[1]||1;
-  document.getElementById('meta').textContent = `기사 ${total}건 분석 · 상위 ${allKeywords.length}개`;
-  document.getElementById('kwGrid').innerHTML = allKeywords.map(([w,c],i) => `
-    <div class="kw-item" id="kwitem${i}" onclick="toggleKw(${i},'${w}')">
-      <div class="kw-check">✓</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="kw-word">${w}</div>
-        <div style="font-size:0.65rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px">#${i+1}</div>
-      </div>
-      <div class="kw-count">${c}회 언급</div>
-      <div class="kw-bar"><div class="kw-bar-fill" style="width:${Math.round(c/maxCount*100)}%"></div></div>
-    </div>`).join('');
+function renderResults(total) {
+  document.getElementById('meta').textContent = `기사 ${total}건 분석 · ${allKeywords.length}개 키워드`;
+
+  // 필터 버튼 — 등장한 소분류만
+  const subs = ['전체', ...new Set(allKeywords.map(k=>k.sub).filter(s=>s!=='미분류'))];
+  document.getElementById('filterBar').innerHTML = subs.map(s =>
+    `<div class="filter-btn${s===activeFilter?' active':''}" onclick="setFilter('${s}')">${s}</div>`
+  ).join('');
+
+  renderKwGrid();
   document.getElementById('resultsWrap').classList.add('show');
 }
 
+function setFilter(sub) {
+  activeFilter = sub;
+  document.querySelectorAll('.filter-btn').forEach(el => el.classList.toggle('active', el.textContent===sub));
+  renderKwGrid();
+}
+
+function renderKwGrid() {
+  const maxCount = allKeywords[0]?.count||1;
+  document.getElementById('kwGrid').innerHTML = allKeywords.map(({word,count,sub,sector},i) => {
+    const hidden = activeFilter !== '전체' && sub !== activeFilter;
+    return `<div class="kw-item${selectedKws.has(word)?' selected':''}${hidden?' hidden':''}" id="kwitem${i}" onclick="toggleKw(${i},'${word}')">
+      <div class="kw-check">✓</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="kw-word">${word}</div>
+        <div style="font-size:0.65rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px">#${i+1}</div>
+      </div>
+      <div class="kw-sub">${sub !== '미분류' ? sub : ''}</div>
+      <div class="kw-count">${count}회</div>
+      <div class="kw-bar"><div class="kw-bar-fill" style="width:${Math.round(count/maxCount*100)}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
 function toggleKw(i, word) {
-  const el = document.getElementById('kwitem'+i);
-  if (selectedKws.has(word)) { selectedKws.delete(word); el.classList.remove('selected'); }
-  else { selectedKws.add(word); el.classList.add('selected'); }
+  if (selectedKws.has(word)) selectedKws.delete(word);
+  else selectedKws.add(word);
+  document.getElementById('kwitem'+i)?.classList.toggle('selected');
 }
 
 function selectAllKw() {
-  allKeywords.forEach(([w],i) => { selectedKws.add(w); document.getElementById('kwitem'+i)?.classList.add('selected'); });
+  allKeywords.forEach(({word},i) => {
+    if (activeFilter==='전체' || allKeywords[i].sub===activeFilter) {
+      selectedKws.add(word);
+      document.getElementById('kwitem'+i)?.classList.add('selected');
+    }
+  });
 }
 
 function goToNewsdesk() {
@@ -434,12 +477,11 @@ function resetAll() {
   document.getElementById('resultsWrap').classList.remove('show');
   document.getElementById('progressWrap').classList.remove('show');
   document.getElementById('bar').style.width = '0%';
-  allKeywords = []; selectedKws.clear();
+  allKeywords = []; selectedKws.clear(); activeFilter = '전체';
 }
 
 initDates();
 renderSectors();
-renderPreview();
 </script>
 </body>
 </html>
