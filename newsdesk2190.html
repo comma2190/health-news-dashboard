@@ -188,7 +188,21 @@ log.appendChild(el);
 log.scrollTop = log.scrollHeight;
 }
 
-async function fetchNaver(keyword, startDate, endDate) {
+// 날짜 범위를 5일씩 분할
+function splitDateRange(startDate, endDate) {
+const ranges = [];
+let cur = new Date(startDate);
+const end = new Date(endDate);
+while (cur <= end) {
+const from = cur.toISOString().split('T')[0];
+const to = new Date(Math.min(cur.getTime() + 4 * 86400000, end.getTime())).toISOString().split('T')[0];
+ranges.push({ from, to });
+cur = new Date(cur.getTime() + 5 * 86400000);
+}
+return ranges;
+}
+
+async function fetchNaverChunk(keyword, startDate, endDate) {
 const startMs = new Date(startDate).getTime();
 const endMs = new Date(endDate + 'T23:59:59').getTime();
 let articles = [];
@@ -219,6 +233,23 @@ await new Promise(r => setTimeout(r, 200));
 } catch(err) { console.error(err); break; }
 }
 return articles;
+}
+
+async function fetchNaver(keyword, startDate, endDate, logFn) {
+const ranges = splitDateRange(startDate, endDate);
+let allArticles = [];
+const seen = new Set();
+
+for (let i = 0; i < ranges.length; i++) {
+const { from, to } = ranges[i];
+if (logFn) logFn(`  └ ${from} ~ ${to} 수집 중... (${i+1}/${ranges.length})`, 'info');
+const chunk = await fetchNaverChunk(keyword, from, to);
+for (const a of chunk) {
+if (!seen.has(a.link)) { seen.add(a.link); allArticles.push(a); }
+}
+await new Promise(r => setTimeout(r, 150));
+}
+return allArticles;
 }
 
 function buildDateChart(articles, startDate, endDate) {
@@ -336,7 +367,7 @@ const k = active[i];
 document.getElementById('bar').style.width = Math.round(i/active.length*100)+'%';
 document.getElementById('status').textContent = `[${i+1}/${active.length}] "${k.text}" 수집 중...`;
 
-const articles = await fetchNaver(k.text, s, e);
+const articles = await fetchNaver(k.text, s, e, addLog);
 const { bars, peakDate, peakCount, dateCounts } = buildDateChart(articles, s, e);
 const datalabData = await fetchDatalab(k.text, s, e);
 const searchBars = datalabData ? buildSearchChart(datalabData) : null;
