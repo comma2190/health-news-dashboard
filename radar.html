@@ -388,21 +388,19 @@ async function startScan() {
   document.getElementById('log').innerHTML = '';
   document.getElementById('bar').style.width = '0%';
 
-  const seeds = SECTORS.filter(s=>!s.divider && selectedSectors.has(s.name));
+  const sectors = SECTORS.filter(s=>!s.divider && selectedSectors.has(s.name));
+  const allSeeds = sectors.flatMap(s => s.seeds);
   let allTitles = [];
-  addLog(`스캔 시작: ${s} ~ ${e} · ${seeds.length}개 대분류`, 'info');
+  addLog(`스캔 시작: ${s} ~ ${e} · ${sectors.length}개 대분류 · ${allSeeds.length}개 키워드`, 'info');
 
-  for (let i=0; i<seeds.length; i++) {
-    const sec = seeds[i];
-    document.getElementById('bar').style.width = Math.round(i/seeds.length*100)+'%';
-    document.getElementById('statusText').textContent = `[${i+1}/${seeds.length}] "${sec.name}" 수집 중...`;
-    const seedWords = sec.seed.split(' ');
-    for (const sw of seedWords) {
-      addLog(`▶ "${sw}"`, 'info');
-      const titles = await fetchTitles(sw, s, e);
-      allTitles = allTitles.concat(titles);
-      addLog(`✓ ${titles.length}건`, 'ok');
-    }
+  for (let i=0; i<allSeeds.length; i++) {
+    const sw = allSeeds[i];
+    document.getElementById('bar').style.width = Math.round(i/allSeeds.length*100)+'%';
+    document.getElementById('statusText').textContent = `[${i+1}/${allSeeds.length}] "${sw}" 수집 중...`;
+    addLog(`▶ "${sw}"`, 'info');
+    const titles = await fetchTitles(sw, s, e);
+    allTitles = allTitles.concat(titles);
+    addLog(`✓ ${titles.length}건`, 'ok');
   }
 
   document.getElementById('bar').style.width = '100%';
