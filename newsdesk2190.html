@@ -119,6 +119,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
   .article-title { font-size:0.82rem; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <header>
@@ -174,6 +175,7 @@ input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor
 <div class="export-row">
 <button class="btn btn-secondary" onclick="exportCSV()">CSV 내보내기</button>
 <button class="btn btn-secondary" onclick="copyTable()">클립보드 복사</button>
+<button class="btn btn-secondary" onclick="saveImage()">이미지 저장</button>
 <button class="btn btn-primary" onclick="goToBriefing()">브리핑 생성 →</button>
 </div>
 </div>
@@ -517,6 +519,32 @@ function toggleArticles(id) {
   const icon = document.getElementById('icon'+idx);
   el.classList.toggle('show');
   icon.classList.toggle('open');
+}
+
+function saveImage() {
+  const el = document.getElementById('resultCards');
+  if (!el) return;
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '저장 중...';
+  html2canvas(el, {
+    backgroundColor: '#0f0f13',
+    scale: 2,
+    useCORS: true,
+    scrollY: 0,
+    windowWidth: el.scrollWidth,
+    windowHeight: el.scrollHeight
+  }).then(canvas => {
+    const a = document.createElement('a');
+    const s = document.getElementById('startDate').value;
+    const e = document.getElementById('endDate').value;
+    a.download = 'news_' + s + '_' + e + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    btn.disabled = false; btn.textContent = '이미지 저장';
+  }).catch(() => {
+    btn.disabled = false; btn.textContent = '이미지 저장';
+    alert('저장 실패. 다시 시도해주세요.');
+  });
 }
 
 function goToBriefing() {
