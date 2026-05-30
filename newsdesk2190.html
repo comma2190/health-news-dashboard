@@ -429,7 +429,10 @@ function buildCombinedChart(articles, startDate, endDate, datalabData) {
   const nArea = `M${padL},${H1} ` + nPts.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${padL+(n-1)*xStep},${H1} Z`;
   const [npx,npy] = nPts[newsPeakIdx];
   const nPeak = newsCounts[newsPeakIdx] > 0 ? `<circle cx="${npx}" cy="${npy}" r="4" fill="#7c6af7" stroke="#0f0f13" stroke-width="1.5"/><text x="${npx}" y="${npy-8}" font-size="9" fill="#7c6af7" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[newsPeakIdx]}건</text>` : '';
-  const nDots = nPts.map(([x,y],i) => i===newsPeakIdx||newsCounts[i]===0 ? '' : `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.7"/>`).join('');
+  const nDots = nPts.map(([x,y],i) => {
+    if (i === newsPeakIdx || newsCounts[i] === 0) return '';
+    return `<circle cx="${x}" cy="${y}" r="2.5" fill="#7c6af7" opacity="0.7"/><text x="${x}" y="${y-6}" font-size="8" fill="#7c6af7" opacity="0.8" text-anchor="middle" font-family="JetBrains Mono">${newsCounts[i]}</text>`;
+  }).join('');
 
   // 검색트렌드 차트 포인트 (x축을 뉴스 날짜 기준으로 맞춤)
   let sLine = '', sArea = '', sPeak = '';
@@ -438,16 +441,16 @@ function buildCombinedChart(articles, startDate, endDate, datalabData) {
     const sPtsMapped = dates.map((d,i) => {
       const found = searchPts.find(p => p.date === d);
       const ratio = found ? found.ratio : null;
-      return { x: padL + i*xStep, ratio };
+      return { x: padL + i*xStep, ratio, date: d };
     });
     const validPts = sPtsMapped.filter(p => p.ratio !== null);
     if (validPts.length > 1) {
-      const sCoords = validPts.map(p => [p.x, sy + 8 + (1-p.ratio)*(H2-16)]);
+      const sCoords = validPts.map(p => [p.x, sy + 8 + (1-p.ratio)*(H2-16), p.date]);
       sLine = sCoords.map(([x,y])=>`${x},${y}`).join(' ');
       sArea = `M${sCoords[0][0]},${sy+H2} ` + sCoords.map(([x,y])=>`L${x},${y}`).join(' ') + ` L${sCoords[sCoords.length-1][0]},${sy+H2} Z`;
       const sMaxIdx = sCoords.indexOf(sCoords.reduce((a,b)=>a[1]<b[1]?a:b));
-      const [spx,spy] = sCoords[sMaxIdx];
-      sPeak = `<circle cx="${spx}" cy="${spy}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/>`;
+      const [spx, spy, spDate] = sCoords[sMaxIdx];
+      sPeak = `<circle cx="${spx}" cy="${spy}" r="4" fill="#f7a94f" stroke="#0f0f13" stroke-width="1.5"/><text x="${spx}" y="${spy-8}" font-size="9" fill="#f7a94f" text-anchor="middle" font-family="JetBrains Mono">${spDate.slice(5)}</text>`;
     }
   }
 
