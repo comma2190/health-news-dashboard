@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이슈 레이더</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root {
+  --bg:#0f0f13; --surface:#16161d; --surface2:#1e1e28;
+  --border:#2a2a38; --accent:#7c6af7; --accent2:#4fc3f7;
+  --text:#e8e8f0; --text2:#8888a8;
+  --success:#4caf82; --warning:#f7a94f; --error:#f76a6a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; padding:1.2rem; }
+header { margin-bottom:1.5rem; padding-bottom:1.2rem; border-bottom:1px solid var(--border); }
+h1 { font-size:1.3rem; font-weight:700; letter-spacing:-0.02em; }
+h1 span { color:var(--accent); }
+.subtitle { font-size:0.78rem; color:var(--text2); margin-top:0.3rem; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin-bottom:1.2rem; }
+.section-title { font-size:0.75rem; font-weight:600; color:var(--text2); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
+label { display:block; font-size:0.72rem; color:var(--text2); margin-bottom:0.4rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; }
+input[type=date], input[type=text] {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; padding:0.6rem 0.8rem; color:var(--text);
+  font-family:'JetBrains Mono',monospace; font-size:0.85rem; outline:none; transition:border-color 0.2s;
+}
+input:focus { border-color:var(--accent); }
+.controls { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+.btn { padding:0.65rem 1.2rem; border-radius:8px; border:none; font-family:'Noto Sans KR',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all 0.2s; text-align:center; }
+.btn-primary { background:var(--accent); color:white; }
+.btn-primary:hover { background:#6a58e8; transform:translateY(-1px); }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
+.btn-secondary:hover { color:var(--text); border-color:var(--accent); }
+.add-row { display:flex; gap:0.5rem; margin-top:0.8rem; }
+.add-row input { flex:1; min-width:0; }
+.seed-grid { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem; min-height:32px; }
+.seed-tag { display:inline-flex; align-items:center; gap:0.4rem; background:var(--surface2); border:1px solid var(--accent); border-radius:6px; padding:0.3rem 0.7rem; font-size:0.82rem; color:var(--accent); }
+.seed-tag span { cursor:pointer; color:var(--text2); font-size:0.7rem; }
+.seed-tag span:hover { color:var(--error); }
+.progress-wrap { display:none; }
+.progress-wrap.show { display:block; }
+.bar-bg { background:var(--surface2); border-radius:100px; height:6px; margin:0.8rem 0; overflow:hidden; }
+.bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:100px; transition:width 0.4s; width:0%; }
+.status { font-size:0.8rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+.log { background:var(--surface2); border-radius:8px; padding:0.8rem; margin-top:0.8rem; max-height:120px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.8; }
+.ok { color:var(--success); } .err { color:var(--error); } .info { color:var(--text2); }
+
+.results-wrap { display:none; }
+.results-wrap.show { display:block; }
+.kw-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:0.6rem; }
+.kw-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:0.8rem 1rem; cursor:pointer; transition:all 0.2s; position:relative; }
+.kw-item:hover { border-color:var(--accent); background:rgba(124,106,247,0.08); transform:translateY(-1px); }
+.kw-item.selected { border-color:var(--accent); background:rgba(124,106,247,0.12); }
+.kw-word { font-size:0.95rem; font-weight:600; margin-bottom:0.3rem; }
+.kw-count { font-size:0.72rem; color:var(--text2); font-family:'JetBrains Mono',monospace; }
+.kw-bar { height:3px; background:var(--border); border-radius:2px; margin-top:0.5rem; overflow:hidden; }
+.kw-bar-fill { height:100%; background:var(--accent); border-radius:2px; }
+.kw-check { position:absolute; top:0.5rem; right:0.5rem; width:16px; height:16px; border-radius:50%; background:var(--accent); display:none; align-items:center; justify-content:center; font-size:0.6rem; color:white; }
+.kw-item.selected .kw-check { display:flex; }
+.action-row { display:flex; gap:0.6rem; margin-top:1rem; flex-wrap:wrap; }
+.action-row .btn { flex:1; min-width:140px; }
+.section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
+
+input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+@media (max-width:480px) {
+  body { padding:0.8rem; }
+  h1 { font-size:1.1rem; }
+  .controls { grid-template-columns:1fr; }
+  .kw-grid { grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>이슈 <span>레이더</span></h1>
+  <p class="subtitle">넓은 키워드로 수집 → 빈도 높은 이슈 추출 → newsdesk로 정밀 수집</p>
+</header>
+
+<div class="card">
+  <div class="section-title">시드 키워드</div>
+  <div class="seed-grid" id="seedGrid"></div>
+  <div class="add-row">
+    <input type="text" id="newSeed" placeholder="키워드 입력..." onkeydown="if(event.key==='Enter'&&!event.isComposing)addSeed()">
+    <button class="btn btn-secondary" onclick="addSeed()">+ 추가</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">수집 기간</div>
+  <div class="controls">
+    <div><label>시작일</label><input type="date" id="startDate"></div>
+    <div><label>종료일</label><input type="date" id="endDate"></div>
+  </div>
+  <div style="display:flex;gap:0.6rem;margin-top:0.8rem">
+    <button class="btn btn-primary" id="scanBtn" onclick="startScan()" style="flex:1">▶ 스캔 시작</button>
+    <button class="btn btn-secondary" onclick="resetAll()">초기화</button>
+  </div>
+</div>
+
+<div class="card progress-wrap" id="progressWrap">
+  <div class="section-title">수집 중...</div>
+  <div class="bar-bg"><div class="bar" id="bar"></div></div>
+  <div class="status" id="status">준비 중...</div>
+  <div class="log" id="log"></div>
+</div>
+
+<div class="results-wrap" id="resultsWrap">
+  <div class="card">
+    <div class="section-header">
+      <span class="section-title">주요 이슈 키워드</span>
+      <span style="font-size:0.78rem;color:var(--text2)" id="meta"></span>
+    </div>
+    <div class="kw-grid" id="kwGrid"></div>
+    <div class="action-row">
+      <button class="btn btn-secondary" onclick="selectAll()">전체 선택</button>
+      <button class="btn btn-primary" onclick="goToNewsdesk()">선택 키워드로 newsdesk 이동 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://news-api-three.vercel.app/api/naver';
+const NEWSDESK_URL = 'https://health-news-dashboard.vercel.app/newsdesk2190.html';
+
+// 불용어 목록
+const STOPWORDS = new Set([
+  '이','그','저','것','수','등','및','또','더','이미','이후','이전','현재','이번','지난',
+  '오늘','내일','어제','올해','지난해','올해','매년','매월','매일','관련','대한','위한',
+  '통한','따른','있는','없는','하는','되는','이는','하고','있다','없다','한다','된다',
+  '했다','됐다','했다','라고','에서','으로','까지','부터','에게','에도','에만','에서',
+  '정도','경우','문제','상황','필요','가능','지원','진행','추진','계획','발표','강조',
+  '제시','검토','마련','실시','시행','도입','개선','확대','강화','운영','관리','제공',
+  '위해','통해','대해','따라','대한','위한','관한','향한','뒤','앞','속','안','밖',
+  '가','나','다','라','마','바','사','아','자','차','카','타','파','하',
+  '것이','것을','것은','것도','것만','하여','하며','하면','하지','하기','하고','하는',
+  '이다','이며','이고','이나','이에','이를','이가','이도','이만','이라','이야',
+  '년','월','일','시','분','초','개','명','건','원','만','억','조','번','회',
+  '및','또한','아울러','특히','다만','즉','곧','그러나','하지만','그런데','그래서',
+  '따라서','그러므로','왜냐하면','물론','사실','결국','이처럼','이러한','이런','저런',
+  '뉴스','기사','보도','언론','미디어','기자','취재','인터뷰','발언','입장',
+]);
+
+let seeds = [];
+let allKeywords = [];
+let selectedKws = new Set();
+
+function initDates() {
+  const today = new Date().toISOString().split('T')[0];
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString().split('T')[0];
+  document.getElementById('startDate').value = weekAgo;
+  document.getElementById('endDate').value = today;
+}
+
+function renderSeeds() {
+  document.getElementById('seedGrid').innerHTML = seeds.map((s,i) => `
+    <div class="seed-tag">${s}<span onclick="removeSeed(${i})">×</span></div>`).join('');
+}
+
+function addSeed() {
+  const v = document.getElementById('newSeed').value.trim();
+  if (!v || seeds.includes(v)) return;
+  seeds.push(v);
+  document.getElementById('newSeed').value = '';
+  renderSeeds();
+}
+
+function removeSeed(i) { seeds.splice(i,1); renderSeeds(); }
+
+function addLog(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = type; el.textContent = msg;
+  const log = document.getElementById('log');
+  log.appendChild(el); log.scrollTop = log.scrollHeight;
+}
+
+function splitDateRange(startDate, endDate) {
+  const ranges = [];
+  let cur = new Date(startDate);
+  const end = new Date(endDate);
+  while (cur <= end) {
+    const from = cur.toISOString().split('T')[0];
+    const to = new Date(Math.min(cur.getTime() + 4*86400000, end.getTime())).toISOString().split('T')[0];
+    ranges.push({ from, to });
+    cur = new Date(cur.getTime() + 5*86400000);
+  }
+  return ranges;
+}
+
+async function fetchTitles(keyword, startDate, endDate) {
+  const startMs = new Date(startDate).getTime();
+  const endMs = new Date(endDate + 'T23:59:59').getTime();
+  const ranges = splitDateRange(startDate, endDate);
+  let titles = [];
+  const seen = new Set();
+
+  for (const { from, to } of ranges) {
+    let idx = 1, reached = false;
+    while (!reached && idx <= 1000) {
+      try {
+        const res = await fetch(`${API_BASE}?keyword=${encodeURIComponent(keyword)}&start=${idx}`);
+        if (!res.ok) break;
+        const data = await res.json();
+        if (!data.items?.length) break;
+        for (const item of data.items) {
+          const pub = new Date(item.pubDate).getTime();
+          if (pub > new Date(to+'T23:59:59').getTime()) continue;
+          if (pub < new Date(from).getTime()) { reached = true; break; }
+          const title = item.title.replace(/<[^>]*>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&');
+          if (!seen.has(title)) { seen.add(title); titles.push(title); }
+        }
+        if (data.items.length < 100) break;
+        idx += 100;
+        await new Promise(r=>setTimeout(r,150));
+      } catch(e) { break; }
+    }
+    await new Promise(r=>setTimeout(r,100));
+  }
+  return titles;
+}
+
+function extractKeywords(titles) {
+  const freq = {};
+  for (const title of titles) {
+    // 특수문자 제거, 공백 분리
+    const words = title
+      .replace(/[^\uAC00-\uD7A3a-zA-Z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 2);
+
+    // 2~5글자 한글 단어 + 영문 단어
+    for (const w of words) {
+      const isKorean = /^[\uAC00-\uD7A3]{2,5}$/.test(w);
+      const isEnglish = /^[a-zA-Z]{3,}$/.test(w);
+      if (!isKorean && !isEnglish) continue;
+      if (STOPWORDS.has(w)) continue;
+      freq[w] = (freq[w] || 0) + 1;
+    }
+
+    // 2글자 연속 조합 (한글)
+    const korOnly = title.replace(/[^\uAC00-\uD7A3\s]/g,' ').split(/\s+/).join('');
+    for (let i=0; i<korOnly.length-1; i++) {
+      const bi = korOnly.slice(i, i+2);
+      if (/^[\uAC00-\uD7A3]{2}$/.test(bi) && !STOPWORDS.has(bi)) {
+        // bigram은 가중치 낮게
+      }
+    }
+  }
+  return Object.entries(freq)
+    .filter(([w,c]) => c >= 2)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 30);
+}
+
+async function startScan() {
+  if (!seeds.length) { alert('시드 키워드를 추가해주세요'); return; }
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  if (!s||!e) { alert('날짜를 입력해주세요'); return; }
+
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('bar').style.width = '0%';
+
+  let allTitles = [];
+  addLog(`스캔 시작: ${s} ~ ${e}`, 'info');
+
+  for (let i=0; i<seeds.length; i++) {
+    const seed = seeds[i];
+    document.getElementById('bar').style.width = Math.round(i/seeds.length*100)+'%';
+    document.getElementById('status').textContent = `[${i+1}/${seeds.length}] "${seed}" 수집 중...`;
+    addLog(`▶ "${seed}" 수집 중...`, 'info');
+    const titles = await fetchTitles(seed, s, e);
+    allTitles = allTitles.concat(titles);
+    addLog(`✓ ${titles.length}건`, 'ok');
+  }
+
+  document.getElementById('bar').style.width = '100%';
+  document.getElementById('status').textContent = `분석 중... (총 ${allTitles.length}건)`;
+  addLog(`총 ${allTitles.length}건 분석 중...`, 'info');
+
+  await new Promise(r=>setTimeout(r,100));
+  allKeywords = extractKeywords(allTitles);
+
+  document.getElementById('status').textContent = `완료! ${allKeywords.length}개 키워드 추출`;
+  document.getElementById('scanBtn').disabled = false;
+
+  renderKeywords(allTitles.length);
+}
+
+function renderKeywords(total) {
+  const maxCount = allKeywords[0]?.[1] || 1;
+  document.getElementById('meta').textContent = `기사 ${total}건 분석 · 상위 ${allKeywords.length}개`;
+  document.getElementById('kwGrid').innerHTML = allKeywords.map(([w,c], i) => `
+    <div class="kw-item" id="kwitem${i}" onclick="toggleKw(${i},'${w}')">
+      <div class="kw-check">✓</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="kw-word">${w}</div>
+        <div style="font-size:0.65rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-top:2px">#${i+1}</div>
+      </div>
+      <div class="kw-count">${c}회 언급</div>
+      <div class="kw-bar"><div class="kw-bar-fill" style="width:${Math.round(c/maxCount*100)}%"></div></div>
+    </div>`).join('');
+  document.getElementById('resultsWrap').classList.add('show');
+}
+
+function toggleKw(i, word) {
+  const el = document.getElementById('kwitem'+i);
+  if (selectedKws.has(word)) { selectedKws.delete(word); el.classList.remove('selected'); }
+  else { selectedKws.add(word); el.classList.add('selected'); }
+}
+
+function selectAll() {
+  allKeywords.forEach(([w,c],i) => {
+    selectedKws.add(w);
+    document.getElementById('kwitem'+i)?.classList.add('selected');
+  });
+}
+
+function goToNewsdesk() {
+  if (!selectedKws.size) { alert('키워드를 선택해주세요'); return; }
+  const params = new URLSearchParams();
+  params.set('keywords', [...selectedKws].join(','));
+  params.set('start', document.getElementById('startDate').value);
+  params.set('end', document.getElementById('endDate').value);
+  window.location.href = NEWSDESK_URL + '?' + params.toString();
+}
+
+function resetAll() {
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('bar').style.width = '0%';
+  allKeywords = []; selectedKws.clear();
+}
+
+initDates();
+renderSeeds();
+</script>
+</body>
+</html>
