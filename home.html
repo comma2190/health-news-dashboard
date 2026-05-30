@@ -231,16 +231,7 @@ async function generateBriefing() {
   for (const r of results) {
     if (!r.articles || !r.articles.length) continue;
     const top15 = r.articles.slice(0,15);
-    const prompt = '보건의료복지 분야 전문 분석가로서 "' + r.text + '" 키워드 뉴스를 분석해 브리핑을 작성하세요.
-
-기사 목록:
-' +
-      top15.map(function(a,i){ return (i+1) + '. ' + a.title + ' (' + a.dateStr + ')'; }).join('
-') +
-      '
-
-JSON만 출력하세요 (다른 텍스트 없이):
-{"tag":"긴급|주목|동향","summary":"3~5문장. 정중하지만 직설적이고 날카롭게.","refs":[{"title":"제목1","url":"url1"},{"title":"제목2","url":"url2"},{"title":"제목3","url":"url3"}],"beneficiary":"정책 수혜자 관점 2~4문장.","civic":"정책 시민단체 관점 2~4문장."}';
+    const prompt = '보건의료복지 분야 전문 분석가로서 "'+r.text+'" 키워드 뉴스를 분석해 브리핑을 작성하세요.\n\n기사 목록:\n'+top15.map(function(a,i){return (i+1)+'. '+a.title+' ('+a.dateStr+')';}).join('\n')+'\n\nJSON만 출력하세요:{"tag":"긴급|주목|동향","summary":"3~5문장.","refs":[{"title":"제목1","url":"url1"},{"title":"제목2","url":"url2"},{"title":"제목3","url":"url3"}],"beneficiary":"정책 수혜자 관점 2~4문장.","civic":"정책 시민단체 관점 2~4문장."}' ;
 
     try {
       const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + GEMINI_KEY, {
