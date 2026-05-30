@@ -19,13 +19,14 @@ header { margin-bottom:2.5rem; padding-bottom:1.2rem; border-bottom:1px solid va
 .logo span { color:var(--accent); }
 .date { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--text2); }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; }
-.menu-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; cursor:pointer; transition:all 0.2s; display:block; position:relative; overflow:hidden; }
+.menu-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.9rem 1rem; cursor:pointer; transition:all 0.2s; display:block; position:relative; overflow:hidden; }
 .menu-card:hover { border-color:var(--accent); transform:translateY(-2px); background:rgba(124,106,247,0.05); }
 a.menu-card { text-decoration:none; color:inherit; }
 .menu-card.disabled { cursor:default; opacity:0.5; pointer-events:none; }
-.card-icon { font-size:1.8rem; margin-bottom:1rem; }
-.card-title { font-size:1rem; font-weight:700; margin-bottom:0.4rem; color:#e8e8f0; }
-.card-desc { font-size:0.82rem; color:#b0b0c8; line-height:1.6; word-break:keep-all; }
+.card-icon { font-size:1.1rem; margin-right:0.5rem; display:inline; }
+.card-title { font-size:0.92rem; font-weight:600; margin-bottom:0.3rem; color:#e8e8f0; display:inline; }
+.card-title-row { display:flex; align-items:center; margin-bottom:0.3rem; }
+.card-desc { font-size:0.78rem; color:#b0b0c8; line-height:1.5; word-break:keep-all; margin-top:0.3rem; }
 .card-badge { position:absolute; top:1rem; right:1rem; font-size:0.65rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:100px; font-family:'JetBrains Mono',monospace; }
 .badge-live { background:rgba(76,175,130,0.15); color:#4caf82; border:1px solid rgba(76,175,130,0.3); }
 .badge-soon { background:rgba(136,136,168,0.1); color:var(--text2); border:1px solid var(--border); }
@@ -72,22 +73,19 @@ a.menu-card { text-decoration:none; color:inherit; }
   <a href="/radar.html" class="menu-card">
     <div class="card-accent"></div>
     <span class="card-badge badge-live">LIVE</span>
-    <div class="card-icon">📡</div>
-    <div class="card-title">이슈 레이더</div>
+    <div class="card-title-row"><span class="card-icon">📡</span><span class="card-title">이슈 레이더</span></div>
     <div class="card-desc">대분류 섹터별 뉴스를 넓게 수집하고 빈도 높은 이슈 키워드를 추출합니다.</div>
   </a>
   <a href="/newsdesk2190.html" class="menu-card">
     <div class="card-accent"></div>
     <span class="card-badge badge-live">LIVE</span>
-    <div class="card-icon">🔍</div>
-    <div class="card-title">뉴스포커스</div>
+    <div class="card-title-row"><span class="card-icon">🔍</span><span class="card-title">뉴스포커스</span></div>
     <div class="card-desc" id="briefDesc">레이더에서 발굴한 키워드를 확대해 보도량과 검색트렌드를 정밀 분석합니다.</div>
   </a>
   <div class="menu-card" id="briefCard" onclick="openBriefing()">
     <div class="card-accent"></div>
     <span class="card-badge badge-live">LIVE</span>
-    <div class="card-icon">📋</div>
-    <div class="card-title">브리핑</div>
+    <div class="card-title-row"><span class="card-icon">📋</span><span class="card-title">브리핑</span></div>
     <div class="card-desc" id="briefCardDesc">수집된 뉴스를 기반으로 정책 수혜자와 시민단체 관점의 브리핑을 자동 생성합니다.</div>
   </div>
 </div>
@@ -97,22 +95,19 @@ a.menu-card { text-decoration:none; color:inherit; }
   <a href="https://laputa2190.quickconnect.to/" target="_blank" class="menu-card">
     <div class="card-accent"></div>
     <span class="card-badge badge-live">LIVE</span>
-    <div class="card-icon">🗄️</div>
-    <div class="card-title">NAS_laputa</div>
+    <div class="card-title-row"><span class="card-icon">🗄️</span><span class="card-title">NAS_laputa</span></div>
     <div class="card-desc">공중에 떠 있는 자료창고 바로가기</div>
   </a>
   <div class="menu-card disabled">
     <div class="card-accent"></div>
     <span class="card-badge badge-soon">SOON</span>
-    <div class="card-icon">📌</div>
-    <div class="card-title">클리핑</div>
+    <div class="card-title-row"><span class="card-icon">📌</span><span class="card-title">클리핑</span></div>
     <div class="card-desc">중요한 기사를 저장하고 태그로 분류해 언제든 다시 찾아볼 수 있습니다.</div>
   </div>
   <div class="menu-card disabled">
     <div class="card-accent"></div>
     <span class="card-badge badge-soon">SOON</span>
-    <div class="card-icon">📊</div>
-    <div class="card-title">레포트</div>
+    <div class="card-title-row"><span class="card-icon">📊</span><span class="card-title">레포트</span></div>
     <div class="card-desc">주간 월간 이슈 흐름을 정리한 레포트를 보관하고 열람합니다.</div>
   </div>
 </div>
@@ -122,8 +117,7 @@ a.menu-card { text-decoration:none; color:inherit; }
   <div class="menu-card disabled">
     <div class="card-accent"></div>
     <span class="card-badge badge-soon">SOON</span>
-    <div class="card-icon">📚</div>
-    <div class="card-title">북</div>
+    <div class="card-title-row"><span class="card-icon">📚</span><span class="card-title">북</span></div>
     <div class="card-desc">읽은 책과 추천 도서를 기록하고 소개합니다.</div>
   </div>
 </div>
