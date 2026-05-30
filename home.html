@@ -21,6 +21,7 @@ header { margin-bottom:2.5rem; padding-bottom:1.2rem; border-bottom:1px solid va
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; }
 .menu-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; cursor:pointer; transition:all 0.2s; display:block; position:relative; overflow:hidden; }
 .menu-card:hover { border-color:var(--accent); transform:translateY(-2px); background:rgba(124,106,247,0.05); }
+a.menu-card { text-decoration:none; color:inherit; }
 .menu-card.disabled { cursor:default; opacity:0.5; pointer-events:none; }
 .card-icon { font-size:1.8rem; margin-bottom:1rem; }
 .card-title { font-size:1rem; font-weight:700; margin-bottom:0.4rem; }
@@ -97,8 +98,8 @@ header { margin-bottom:2.5rem; padding-bottom:1.2rem; border-bottom:1px solid va
     <div class="card-accent"></div>
     <span class="card-badge badge-live">LIVE</span>
     <div class="card-icon">🗄️</div>
-    <div class="card-title">NAS</div>
-    <div class="card-desc">개인 NAS 스토리지에 접속합니다.</div>
+    <div class="card-title">NAS_laputa</div>
+    <div class="card-desc">공중에 떠 있는 자료창고 바로가기</div>
   </a>
   <div class="menu-card disabled">
     <div class="card-accent"></div>
