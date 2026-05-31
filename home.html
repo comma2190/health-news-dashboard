@@ -5,793 +5,711 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xi0 - WORKPLACE</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-light: #f5f3f0;
-  --surface-light: #ffffff;
-  --surface2-light: #faf8f6;
-  --border-light: #e8e5e0;
-  --text-light: #2c2c2c;
-  --text2-light: #6b6b6b;
-  --accent-light: #ffc107;
-  --accent2-light: #7c6af7;
-  
-  --bg-dark: #0a0a0f;
-  --surface-dark: #13131a;
-  --surface2-dark: #1a1a24;
-  --border-dark: #252535;
-  --text-dark: #e2e2f0;
-  --text2-dark: #7a7a9a;
-  --accent-dark: #7c6af7;
-  --accent2-dark: #4fc3f7;
-  
-  --bg: var(--bg-light);
-  --surface: var(--surface-light);
-  --surface2: var(--surface2-light);
-  --border: var(--border-light);
-  --text: var(--text-light);
-  --text2: var(--text2-light);
-  --accent: var(--accent-light);
-  --accent2: var(--accent2-light);
+  --bg:#0a0a0f;
+  --surface:#13131a;
+  --surface2:#1a1a24;
+  --surface3:#20202e;
+  --border:#252535;
+  --border2:#2e2e44;
+  --accent:#7c6af7;
+  --accent2:#4fc3f7;
+  --accent3:#4cde9a;
+  --text:#e2e2f0;
+  --text2:#7a7a9a;
+  --text3:#4a4a6a;
 }
-
-body.dark-mode {
-  --bg: var(--bg-dark);
-  --surface: var(--surface-dark);
-  --surface2: var(--surface2-dark);
-  --border: var(--border-dark);
-  --text: var(--text-dark);
-  --text2: var(--text2-dark);
-  --accent: var(--accent-dark);
-  --accent2: var(--accent2-dark);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Sans KR', sans-serif;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: 100vh;
-  transition: background 0.3s, color 0.3s;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  display:grid;
+  grid-template-rows:auto 1fr;
+  grid-template-columns:1fr;
+  height:100vh;
+  padding:0;
 }
 
 /* ── HEADER ── */
 header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  padding:0.75rem 1.5rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  flex-shrink:0;
 }
 .logo {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.85rem;
+  font-weight:700;
+  letter-spacing:0.12em;
+  color:var(--text2);
+  white-space:nowrap;
 }
-.logo em {
-  color: var(--accent);
-  font-style: normal;
+.logo em { color:var(--accent); font-style:normal; }
+.header-center {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.5rem;
 }
 .search-bar {
-  width: 280px;
-  display: flex;
-  align-items: center;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0 0.75rem;
-  height: 36px;
-  gap: 0.5rem;
+  width:100%;
+  max-width:400px;
+  display:flex;
+  align-items:center;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:0 0.75rem;
+  height:32px;
+  gap:0.5rem;
 }
 .search-bar input {
-  flex: 1;
-  background: none;
-  border: none;
-  outline: none;
-  color: var(--text);
-  font-size: 0.9rem;
+  flex:1;
+  background:none;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.82rem;
 }
-.search-bar input::placeholder { color: var(--text2); }
+.search-bar input::placeholder { color:var(--text3); }
+.search-icon { color:var(--text3); font-size:0.8rem; }
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.theme-toggle {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-.theme-toggle:hover {
-  background: var(--border);
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex-shrink:0;
 }
 .clock {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-  color: var(--text);
-  text-align: right;
-  white-space: nowrap;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.85rem;
+  color:var(--text);
+  letter-spacing:0.05em;
 }
 .date-str {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  color: var(--text2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  color:var(--text2);
+  letter-spacing:0.04em;
 }
 
-/* ── MAIN ── */
+/* ── MAIN LAYOUT ── */
 .workspace {
-  display: grid;
-  grid-template-columns: 220px 1fr 280px;
-  grid-template-rows: 1fr;
-  overflow: hidden;
-  min-height: 0;
+  display:grid;
+  grid-template-columns:200px 1fr 220px;
+  grid-template-rows:1fr;
+  overflow:hidden;
+  min-height:0;
 }
 
-/* ── SIDEBAR ── */
+/* ── LEFT SIDEBAR ── */
 .sidebar {
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem 0;
-  overflow-y: auto;
-  background: var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:1rem 0;
+  overflow-y:auto;
+  gap:0.25rem;
 }
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { 
-  background: var(--border);
-  border-radius: 2px;
-}
+.sidebar::-webkit-scrollbar { width:3px; }
+.sidebar::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 .sidebar-section {
-  padding: 0.75rem 1.25rem 0.5rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text2);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-family: 'JetBrains Mono', monospace;
-  margin-top: 1rem;
+  padding:0.5rem 1rem 0.25rem;
+  font-size:0.62rem;
+  font-weight:600;
+  color:var(--text3);
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  margin-top:0.5rem;
 }
-.sidebar-section:first-child { margin-top: 0; }
+.sidebar-section:first-child { margin-top:0; }
 .nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 1.25rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  color: var(--text2);
-  font-size: 0.9rem;
-  border-left: 3px solid transparent;
-  position: relative;
+  display:flex;
+  align-items:center;
+  gap:0.6rem;
+  padding:0.45rem 1rem;
+  cursor:pointer;
+  transition:all 0.15s;
+  text-decoration:none;
+  color:var(--text2);
+  font-size:0.84rem;
+  border-left:2px solid transparent;
+  position:relative;
 }
 .nav-item:hover {
-  background: var(--surface2);
-  color: var(--text);
-  border-left-color: var(--accent);
+  background:var(--surface2);
+  color:var(--text);
+  border-left-color:var(--border2);
 }
 .nav-item.active {
-  background: rgba(255, 193, 7, 0.1);
-  color: var(--accent);
-  border-left-color: var(--accent);
+  background:rgba(124,106,247,0.1);
+  color:var(--accent);
+  border-left-color:var(--accent);
 }
-body.dark-mode .nav-item.active {
-  background: rgba(124, 106, 247, 0.1);
-  color: var(--accent2);
-  border-left-color: var(--accent2);
-}
-.nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+.nav-item .nav-icon { font-size:0.9rem; width:16px; text-align:center; }
 .nav-badge {
-  margin-left: auto;
-  font-size: 0.6rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 100px;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  background: rgba(255, 193, 7, 0.15);
-  color: #f57f17;
+  margin-left:auto;
+  font-size:0.58rem;
+  padding:0.15rem 0.4rem;
+  border-radius:100px;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:600;
 }
-body.dark-mode .nav-badge {
-  background: rgba(76, 222, 154, 0.15);
-  color: #4cde9a;
-}
+.badge-live { background:rgba(76,222,154,0.15); color:var(--accent3); border:1px solid rgba(76,222,154,0.25); }
+.badge-soon { background:rgba(74,74,106,0.3); color:var(--text3); border:1px solid var(--border); }
 
 /* ── CENTER ── */
 .center {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--bg);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  min-height:0;
 }
-.center-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+.center-top {
+  padding:1rem 1.5rem 0.75rem;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
-.section-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text2);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
+.section-title {
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;
+  color:var(--text3);
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-bottom:0.75rem;
 }
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+.ai-grid {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:0.5rem;
 }
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.ai-card {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.35rem;
+  padding:0.6rem 0.4rem;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  text-decoration:none;
+  color:var(--text2);
+  font-size:0.72rem;
+  transition:all 0.15s;
+  cursor:pointer;
+  text-align:center;
+  min-width:0;
 }
-.card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+.ai-card:hover {
+  border-color:var(--border2);
+  background:var(--surface3);
+  color:var(--text);
+  transform:translateY(-1px);
 }
-body.dark-mode .card:hover {
-  border-color: var(--accent2);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+.ai-card .ai-icon {
+  font-size:1.3rem;
+  line-height:1;
 }
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.ai-card .ai-label {
+  font-size:0.68rem;
+  color:var(--text2);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  width:100%;
+  text-align:center;
 }
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-}
-.card-icon { font-size: 1.3rem; }
-.card-menu { 
-  background: none;
-  border: none;
-  color: var(--text2);
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-.card-meta {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.meta-badge {
-  font-size: 0.75rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  background: rgba(255, 193, 7, 0.1);
-  color: #f57f17;
-}
-body.dark-mode .meta-badge {
-  background: rgba(76, 222, 154, 0.1);
-  color: #4cde9a;
-}
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: var(--surface2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ffc107, #ffb300);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-body.dark-mode .progress-fill {
-  background: linear-gradient(90deg, #7c6af7, #6c5ae0);
-}
-.card-desc {
-  font-size: 0.85rem;
-  color: var(--text2);
-  line-height: 1.5;
-}
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
-.team-avatars {
-  display: flex;
-  margin: -0.35rem 0;
-}
-.avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--surface);
-  background: linear-gradient(135deg, #ffc107, #ffb300);
-  font-size: 0.65rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-}
-.avatar:not(:first-child) { margin-left: -0.5rem; }
-.avatar.av2 { background: linear-gradient(135deg, #7c6af7, #6c5ae0); }
-.avatar.av3 { background: linear-gradient(135deg, #4fc3f7, #29b6f6); }
-.avatar.av4 { background: linear-gradient(135deg, #4cde9a, #2cc5a0); }
-.card-status {
-  font-size: 0.8rem;
-  color: var(--text2);
+.ai-card:hover .ai-label { color:var(--text); }
+
+/* second row AI */
+.ai-grid-2 {
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:0.5rem;
+  margin-top:0.5rem;
 }
 
 .center-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-  min-height: 0;
+  flex:1;
+  overflow-y:auto;
+  padding:1rem 1.5rem;
+  min-height:0;
 }
-.center-body::-webkit-scrollbar { width: 4px; }
-.center-body::-webkit-scrollbar-thumb { 
-  background: var(--border);
-  border-radius: 2px;
+.center-body::-webkit-scrollbar { width:3px; }
+.center-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* 캘린더 */
+.mini-cal {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1rem;
+  margin-bottom:1rem;
 }
+.cal-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:0.75rem;
+}
+.cal-title {
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.78rem;
+  color:var(--text);
+  font-weight:600;
+}
+.cal-nav {
+  display:flex;
+  gap:0.25rem;
+}
+.cal-nav button {
+  background:none;
+  border:1px solid var(--border2);
+  color:var(--text2);
+  width:22px;
+  height:22px;
+  border-radius:5px;
+  cursor:pointer;
+  font-size:0.7rem;
+  transition:all 0.1s;
+}
+.cal-nav button:hover { background:var(--surface3); color:var(--text); }
+.cal-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:2px;
+  text-align:center;
+}
+.cal-day-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;
+  color:var(--text3);
+  padding:0.2rem 0;
+}
+.cal-day {
+  font-size:0.72rem;
+  padding:0.3rem 0;
+  border-radius:5px;
+  cursor:pointer;
+  color:var(--text2);
+  transition:all 0.1s;
+  font-family:'JetBrains Mono',monospace;
+}
+.cal-day:hover { background:var(--surface3); color:var(--text); }
+.cal-day.today {
+  background:rgba(124,106,247,0.2);
+  color:var(--accent);
+  font-weight:700;
+}
+.cal-day.other-month { color:var(--text3); }
+.cal-day.has-event::after {
+  content:'';
+  display:block;
+  width:4px;
+  height:4px;
+  background:var(--accent3);
+  border-radius:50%;
+  margin:1px auto 0;
+}
+.cal-day.sun { color:#f76a6a; }
+.cal-day.sun.today { color:#f76a6a; }
 
 /* ── RIGHT PANEL ── */
 .right-panel {
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  overflow: hidden;
+  border-left:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
 .panel-section {
-  padding: 1.25rem;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  overflow-y: auto;
-}
-.panel-section:last-child {
-  border-bottom: none;
-  flex: 1;
-}
-.panel-section::-webkit-scrollbar { width: 3px; }
-.panel-section::-webkit-scrollbar-thumb { 
-  background: var(--border);
-  border-radius: 2px;
+  padding:0.875rem 1rem;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
 .panel-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text2);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;
+  color:var(--text3);
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  margin-bottom:0.6rem;
 }
 
-/* Calendar */
-.mini-cal {
-  background: transparent;
+/* 할일 */
+.todo-input-row {
+  display:flex;
+  gap:0.4rem;
+  margin-bottom:0.5rem;
 }
-.cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
+.todo-input {
+  flex:1;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:0.35rem 0.6rem;
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.78rem;
+  outline:none;
 }
-.cal-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
+.todo-input:focus { border-color:var(--accent); }
+.todo-input::placeholder { color:var(--text3); }
+.todo-add-btn {
+  background:rgba(124,106,247,0.2);
+  border:1px solid rgba(124,106,247,0.3);
+  color:var(--accent);
+  border-radius:6px;
+  width:28px;
+  height:28px;
+  cursor:pointer;
+  font-size:1rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:all 0.15s;
 }
-.cal-nav {
-  display: flex;
-  gap: 0.4rem;
+.todo-add-btn:hover { background:rgba(124,106,247,0.35); }
+.todo-list {
+  display:flex;
+  flex-direction:column;
+  gap:0.3rem;
+  max-height:140px;
+  overflow-y:auto;
 }
-.cal-nav button {
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--text);
-  font-size: 0.85rem;
-  transition: all 0.2s;
+.todo-list::-webkit-scrollbar { width:2px; }
+.todo-list::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+.todo-item {
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:0.3rem 0.4rem;
+  border-radius:6px;
+  transition:background 0.1s;
+  cursor:pointer;
 }
-.cal-nav button:hover {
-  background: var(--border);
+.todo-item:hover { background:var(--surface3); }
+.todo-check {
+  width:14px;
+  height:14px;
+  border:1.5px solid var(--border2);
+  border-radius:3px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.15s;
 }
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  text-align: center;
+.todo-item.done .todo-check {
+  background:rgba(76,222,154,0.2);
+  border-color:var(--accent3);
 }
-.cal-day-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text2);
-  padding: 0.5rem 0;
+.todo-item.done .todo-check::after {
+  content:'✓';
+  font-size:0.6rem;
+  color:var(--accent3);
 }
-.cal-day {
-  font-size: 0.8rem;
-  padding: 0.4rem;
-  border-radius: 6px;
-  cursor: pointer;
-  color: var(--text);
-  transition: all 0.15s;
-  border: 1px solid transparent;
+.todo-text {
+  font-size:0.78rem;
+  color:var(--text);
+  flex:1;
 }
-.cal-day:hover {
-  background: var(--surface2);
+.todo-item.done .todo-text {
+  text-decoration:line-through;
+  color:var(--text3);
 }
-.cal-day.today {
-  background: var(--accent);
-  color: white;
-  font-weight: 600;
-  border-color: var(--accent);
+.todo-del {
+  font-size:0.7rem;
+  color:var(--text3);
+  opacity:0;
+  cursor:pointer;
+  transition:opacity 0.1s;
+  background:none;
+  border:none;
+  padding:0 2px;
 }
-body.dark-mode .cal-day.today {
-  background: var(--accent2);
-  color: white;
-  border-color: var(--accent2);
-}
-.cal-day.other-month {
-  color: var(--text2);
-  opacity: 0.4;
-}
+.todo-item:hover .todo-del { opacity:1; }
 
-/* Messages */
-.msg-item {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s;
+/* 메모 */
+.memo-area {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:0.875rem 1rem;
+  min-height:0;
 }
-.msg-item:last-child {
-  border-bottom: none;
+.memo-textarea {
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:0.8rem;
+  line-height:1.7;
+  resize:none;
+  min-height:0;
 }
-.msg-item:hover {
-  background: var(--surface2);
-  margin: 0 -0.5rem;
-  padding: 0.75rem 0.5rem;
-}
-.msg-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ffc107, #ffb300);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-.msg-avatar.av2 { background: linear-gradient(135deg, #7c6af7, #6c5ae0); }
-.msg-avatar.av3 { background: linear-gradient(135deg, #4fc3f7, #29b6f6); }
-.msg-avatar.av4 { background: linear-gradient(135deg, #4cde9a, #2cc5a0); }
-.msg-content {
-  flex: 1;
-  min-width: 0;
-}
-.msg-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 0.2rem;
-}
-.msg-text {
-  font-size: 0.75rem;
-  color: var(--text2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.memo-textarea::placeholder { color:var(--text3); }
+.memo-footer {
+  padding-top:0.4rem;
+  border-top:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;
+  color:var(--text3);
+  display:flex;
+  justify-content:space-between;
 }
 
 /* ── MODAL ── */
 .modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  z-index:200;
+  align-items:center;
+  justify-content:center;
 }
-.modal-overlay.open {
-  display: flex;
-}
+.modal-overlay.open { display:flex; }
 .modal-box {
-  width: 90%;
-  max-width: 680px;
-  max-height: 85vh;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width:680px;
+  width:90%;
+  max-height:85vh;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 .modal-header {
-  padding: 1.25rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding:1rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
 }
 .modal-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.82rem;
+  color:var(--accent);
 }
 .modal-close {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text2);
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.15s;
+  background:none;
+  border:1px solid var(--border2);
+  color:var(--text2);
+  width:26px;
+  height:26px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:0.85rem;
+  transition:all 0.1s;
 }
-.modal-close:hover {
-  background: var(--surface2);
-  color: var(--text);
+.modal-close:hover { background:var(--surface3); color:var(--text); }
+.modal-body { flex:1; overflow-y:auto; padding:1.25rem; }
+.modal-body::-webkit-scrollbar { width:3px; }
+.modal-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+.auth-box { text-align:center; padding:2rem 0; }
+.auth-label { font-size:0.82rem; color:var(--text2); margin-bottom:1rem; }
+.auth-input {
+  width:200px;
+  padding:0.6rem 0.8rem;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.85rem;
+  outline:none;
+  text-align:center;
+  display:block;
+  margin:0 auto 0.8rem;
 }
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
+.auth-input:focus { border-color:var(--accent); }
+.auth-btn {
+  padding:0.6rem 1.5rem;
+  background:var(--accent);
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:0.85rem;
 }
-.modal-body::-webkit-scrollbar { width: 4px; }
-.modal-body::-webkit-scrollbar-thumb { 
-  background: var(--border);
-  border-radius: 2px;
+.auth-msg { color:#f76a6a; font-size:0.78rem; margin-top:0.5rem; }
+.gen-btn {
+  width:100%;
+  padding:0.7rem;
+  background:var(--accent);
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:0.88rem;
+  font-weight:500;
+  cursor:pointer;
+  font-family:inherit;
+  margin-bottom:1.2rem;
 }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 1024px) {
-  .workspace {
-    grid-template-columns: 180px 1fr 240px;
-  }
-  .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.gen-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.copy-all-btn {
+  display:none;
+  width:100%;
+  padding:0.65rem;
+  background:var(--surface2);
+  color:var(--text2);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  font-size:0.83rem;
+  cursor:pointer;
+  font-family:inherit;
+  margin-top:0.8rem;
 }
-
-@media (max-width: 768px) {
-  html, body { height: auto; overflow: auto; }
-  body { display: block; height: auto; }
-  
-  header { padding: 0.75rem 1rem; }
-  .search-bar { width: 100%; max-width: none; }
-  .date-str { display: none; }
-  
-  .workspace { display: block; }
-  .sidebar { display: none; }
-  .right-panel { display: none; }
-  .center { overflow: visible; }
-  .center-header { padding: 1rem; }
-  .center-body { overflow: visible; padding: 1rem; }
-  .cards-grid { grid-template-columns: 1fr; }
+.brief-meta {
+  font-size:0.78rem;
+  color:var(--text2);
+  margin-bottom:1rem;
+  font-family:'JetBrains Mono',monospace;
 }
+.brief-item { border:1px solid var(--border); border-radius:10px; margin-bottom:1rem; overflow:hidden; }
+.brief-item-header { padding:1rem; border-bottom:1px solid var(--border); }
+.brief-item-refs { padding:0.8rem 1rem; background:var(--surface2); border-bottom:1px solid var(--border); }
+.brief-item-persp { padding:0.8rem 1rem; border-bottom:1px solid var(--border); }
+.brief-item-persp:last-child { border-bottom:none; }
+.persp-label { font-size:0.68rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.4rem; }
+.persp-text { font-size:0.83rem; line-height:1.7; word-break:keep-all; }
 </style>
 </head>
 <body>
 
+<!-- ── HEADER ── -->
 <header>
-  <div class="header-left">
-    <div class="logo">[ <em>Xi0</em> ]</div>
+  <div class="logo">[ <em>Xi0</em> · WORKPLACE ]</div>
+  <div class="header-center">
     <div class="search-bar">
-      <span>⌕</span>
-      <input type="text" placeholder="Search..." onkeydown="if(event.key==='Enter')window.open('https://www.google.com/search?q='+encodeURIComponent(this.value))">
+      <span class="search-icon">⌕</span>
+      <input id="searchInput" type="text" placeholder="Google 검색..." onkeydown="handleSearch(event)">
     </div>
   </div>
   <div class="header-right">
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
     <div>
-      <div class="clock" id="clockEl">--:--</div>
+      <div class="clock" id="clockEl">--:--:--</div>
       <div class="date-str" id="dateEl"></div>
     </div>
   </div>
 </header>
 
+<!-- ── WORKSPACE ── -->
 <div class="workspace">
-  <!-- SIDEBAR -->
+
+  <!-- LEFT: NAV -->
   <aside class="sidebar">
     <div class="sidebar-section">뉴스 분석</div>
     <a href="/radar.html" class="nav-item">
-      <span class="nav-icon">📡</span>
-      <span>이슈 레이더</span>
-      <span class="nav-badge">LIVE</span>
+      <span class="nav-icon">📡</span> 이슈 레이더
+      <span class="nav-badge badge-live">LIVE</span>
     </a>
     <a href="/newsdesk2190.html" class="nav-item">
-      <span class="nav-icon">🔍</span>
-      <span>뉴스포커스</span>
-      <span class="nav-badge">LIVE</span>
+      <span class="nav-icon">🔍</span> 뉴스포커스
+      <span class="nav-badge badge-live">LIVE</span>
     </a>
     <div class="nav-item" onclick="openBriefing()" style="cursor:pointer;">
-      <span class="nav-icon">📋</span>
-      <span>브리핑</span>
-      <span class="nav-badge">LIVE</span>
+      <span class="nav-icon">📋</span> 브리핑
+      <span class="nav-badge badge-live">LIVE</span>
     </div>
-    
+
     <div class="sidebar-section">아카이브</div>
     <a href="https://laputa2190.quickconnect.to/" target="_blank" class="nav-item">
-      <span class="nav-icon">🗄️</span>
-      <span>NAS</span>
-      <span class="nav-badge">LIVE</span>
+      <span class="nav-icon">🗄️</span> NAS_laputa
+      <span class="nav-badge badge-live">LIVE</span>
     </a>
-    <div class="nav-item" style="opacity:0.4;">
-      <span class="nav-icon">📌</span>
-      <span>클리핑</span>
+    <div class="nav-item" style="opacity:0.4;cursor:default;">
+      <span class="nav-icon">📌</span> 클리핑
+      <span class="nav-badge badge-soon">SOON</span>
     </div>
-    <div class="nav-item" style="opacity:0.4;">
-      <span class="nav-icon">📊</span>
-      <span>레포트</span>
+    <div class="nav-item" style="opacity:0.4;cursor:default;">
+      <span class="nav-icon">📊</span> 레포트
+      <span class="nav-badge badge-soon">SOON</span>
     </div>
-    
+
     <div class="sidebar-section">라이브러리</div>
-    <div class="nav-item" style="opacity:0.4;">
-      <span class="nav-icon">📚</span>
-      <span>북</span>
+    <div class="nav-item" style="opacity:0.4;cursor:default;">
+      <span class="nav-icon">📚</span> 북
+      <span class="nav-badge badge-soon">SOON</span>
     </div>
   </aside>
 
   <!-- CENTER -->
   <main class="center">
-    <div class="center-header">
-      <div class="section-label">프로젝트 & 작업</div>
-    </div>
-    <div class="center-body">
-      <div class="cards-grid">
-        <!-- 이슈레이더 카드 -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <span class="card-icon">📡</span>
-              <span>이슈 레이더</span>
-            </div>
-            <button class="card-menu">⋯</button>
-          </div>
-          <div class="card-meta">
-            <span class="meta-badge">LIVE</span>
-            <span class="meta-badge">진행중</span>
-          </div>
-          <p class="card-desc">섹터별 뉴스를 넓게 수집하고 빈도 키워드를 추출합니다.</p>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 65%;"></div>
-          </div>
-          <div class="card-footer">
-            <div class="team-avatars">
-              <div class="avatar">ME</div>
-              <div class="avatar av2">K1</div>
-              <div class="avatar av3">K2</div>
-            </div>
-            <span class="card-status">65% 완료</span>
-          </div>
-        </div>
-
-        <!-- 뉴스포커스 카드 -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <span class="card-icon">🔍</span>
-              <span>뉴스포커스</span>
-            </div>
-            <button class="card-menu">⋯</button>
-          </div>
-          <div class="card-meta">
-            <span class="meta-badge">LIVE</span>
-          </div>
-          <p class="card-desc">키워드별 뉴스 세부자료 수집 및 관리</p>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 85%;"></div>
-          </div>
-          <div class="card-footer">
-            <div class="team-avatars">
-              <div class="avatar">ME</div>
-              <div class="avatar av2">K1</div>
-            </div>
-            <span class="card-status">85% 완료</span>
-          </div>
-        </div>
-
-        <!-- 브리핑 카드 -->
-        <div class="card" onclick="openBriefing()" style="cursor:pointer;">
-          <div class="card-header">
-            <div class="card-title">
-              <span class="card-icon">📋</span>
-              <span>브리핑</span>
-            </div>
-            <button class="card-menu">⋯</button>
-          </div>
-          <div class="card-meta">
-            <span class="meta-badge">LIVE</span>
-          </div>
-          <p class="card-desc">Gemini AI 기반 이슈별 브리핑 생성</p>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 45%;"></div>
-          </div>
-          <div class="card-footer">
-            <div class="team-avatars">
-              <div class="avatar">ME</div>
-            </div>
-            <span class="card-status">45% 완료</span>
-          </div>
-        </div>
-
-        <!-- AI 도구 카드 -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">
-              <span class="card-icon">🤖</span>
-              <span>AI 도구</span>
-            </div>
-            <button class="card-menu">⋯</button>
-          </div>
-          <div class="card-meta">
-            <span class="meta-badge">활성</span>
-          </div>
-          <p class="card-desc">Claude, ChatGPT, Gemini, Perplexity, Canva 등</p>
-          <div class="card-footer">
-            <div class="team-avatars">
-              <div class="avatar">C</div>
-              <div class="avatar av2">G</div>
-              <div class="avatar av3">P</div>
-              <div class="avatar av4">+3</div>
-            </div>
-            <span class="card-status">11개</span>
-          </div>
-        </div>
+    <!-- AI 도구 -->
+    <div class="center-top">
+      <div class="section-title">AI 도구</div>
+      <div class="ai-grid">
+        <a href="https://claude.ai" target="_blank" class="ai-card">
+          <div class="ai-icon">🤖</div>
+          <div class="ai-label">Claude</div>
+        </a>
+        <a href="https://chat.openai.com" target="_blank" class="ai-card">
+          <div class="ai-icon">💬</div>
+          <div class="ai-label">ChatGPT</div>
+        </a>
+        <a href="https://gemini.google.com" target="_blank" class="ai-card">
+          <div class="ai-icon">✨</div>
+          <div class="ai-label">Gemini</div>
+        </a>
+        <a href="https://www.perplexity.ai" target="_blank" class="ai-card">
+          <div class="ai-icon">🔮</div>
+          <div class="ai-label">Perplexity</div>
+        </a>
+        <a href="https://grok.com" target="_blank" class="ai-card">
+          <div class="ai-icon">⚡</div>
+          <div class="ai-label">Grok</div>
+        </a>
+      </div>
+      <div class="ai-grid-2">
+        <a href="https://www.canva.com" target="_blank" class="ai-card">
+          <div class="ai-icon">🎨</div>
+          <div class="ai-label">Canva</div>
+        </a>
+        <a href="https://www.adobe.com/express/" target="_blank" class="ai-card">
+          <div class="ai-icon">🅰️</div>
+          <div class="ai-label">Adobe Express</div>
+        </a>
+        <a href="https://ideogram.ai" target="_blank" class="ai-card">
+          <div class="ai-icon">🖼️</div>
+          <div class="ai-label">Ideogram</div>
+        </a>
+        <a href="https://gamma.app" target="_blank" class="ai-card">
+          <div class="ai-icon">📑</div>
+          <div class="ai-label">Gamma</div>
+        </a>
+        <a href="https://www.notion.so" target="_blank" class="ai-card">
+          <div class="ai-icon">📝</div>
+          <div class="ai-label">Notion</div>
+        </a>
+        <a href="https://www.figma.com" target="_blank" class="ai-card">
+          <div class="ai-icon">🎭</div>
+          <div class="ai-label">Figma</div>
+        </a>
       </div>
     </div>
-  </main>
 
-  <!-- RIGHT PANEL -->
-  <aside class="right-panel">
-    <!-- Calendar -->
-    <div class="panel-section">
-      <div class="panel-label">캘린더</div>
+    <!-- 캘린더 -->
+    <div class="center-body">
       <div class="mini-cal">
         <div class="cal-header">
           <div class="cal-title" id="calTitle"></div>
@@ -803,37 +721,28 @@ body.dark-mode .cal-day.today {
         <div class="cal-grid" id="calGrid"></div>
       </div>
     </div>
+  </main>
 
-    <!-- Messages -->
-    <div class="panel-section">
-      <div class="panel-label">메시지</div>
-      <div class="msg-item">
-        <div class="msg-avatar">JD</div>
-        <div class="msg-content">
-          <div class="msg-name">John Doe</div>
-          <div class="msg-text">뉴스포커스 데이터 확인했어요</div>
-        </div>
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel">
+    <!-- 할일 -->
+    <div class="panel-section" style="flex-shrink:0;">
+      <div class="panel-label">할 일</div>
+      <div class="todo-input-row">
+        <input class="todo-input" id="todoInput" type="text" placeholder="새 항목 추가..."
+          onkeydown="if(event.key==='Enter')addTodo()">
+        <button class="todo-add-btn" onclick="addTodo()">+</button>
       </div>
-      <div class="msg-item">
-        <div class="msg-avatar av2">CH</div>
-        <div class="msg-content">
-          <div class="msg-name">Charmie</div>
-          <div class="msg-text">브리핑 생성 준비 완료</div>
-        </div>
-      </div>
-      <div class="msg-item">
-        <div class="msg-avatar av3">JM</div>
-        <div class="msg-content">
-          <div class="msg-name">Jason Mandela</div>
-          <div class="msg-text">이슈레이더 결과 공유</div>
-        </div>
-      </div>
-      <div class="msg-item">
-        <div class="msg-avatar av4">CC</div>
-        <div class="msg-content">
-          <div class="msg-name">Charlie Chu</div>
-          <div class="msg-text">주간 리포트 예정</div>
-        </div>
+      <div class="todo-list" id="todoList"></div>
+    </div>
+
+    <!-- 메모 -->
+    <div class="memo-area">
+      <div class="panel-label">메모</div>
+      <textarea class="memo-textarea" id="memoArea" placeholder="자유롭게 메모하세요..."></textarea>
+      <div class="memo-footer">
+        <span id="memoCount">0자</span>
+        <span>자동저장</span>
       </div>
     </div>
   </aside>
@@ -843,262 +752,280 @@ body.dark-mode .cal-day.today {
 <div class="modal-overlay" id="briefModal" onclick="if(event.target===this)closeBriefing()">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-title">📋 브리핑</div>
+      <div class="modal-title">[ 브리핑 ]</div>
       <button class="modal-close" onclick="closeBriefing()">✕</button>
     </div>
     <div class="modal-body">
       <div id="briefAuthArea">
-        <div style="text-align:center; padding:2rem 0;">
-          <div style="font-size:0.9rem; color:var(--text2); margin-bottom:1rem;">브리핑 암호를 입력하세요</div>
-          <input type="password" id="briefPw" style="
-            width:200px; padding:0.65rem 0.85rem; border:1px solid var(--border);
-            border-radius:8px; background:var(--surface2); color:var(--text);
-            font-family:'Noto Sans KR',sans-serif; font-size:0.9rem; text-align:center;
-            display:block; margin:0 auto 1rem; outline:none;"
+        <div class="auth-box">
+          <div class="auth-label">브리핑 암호를 입력하세요</div>
+          <input type="password" id="briefPw" class="auth-input" placeholder="암호"
             onkeydown="if(event.key==='Enter')checkBriefAuth()">
-          <button onclick="checkBriefAuth()" style="
-            padding:0.65rem 1.5rem; background:var(--accent); color:white;
-            border:none; border-radius:8px; cursor:pointer; font-family:inherit;
-            font-size:0.9rem;">입장</button>
-          <div id="briefAuthMsg" style="color:#f44336; font-size:0.8rem; margin-top:0.5rem;"></div>
+          <button class="auth-btn" onclick="checkBriefAuth()">입장</button>
+          <div class="auth-msg" id="briefAuthMsg"></div>
         </div>
       </div>
-      <div id="briefContentArea" style="display:none;">
-        <div style="font-size:0.8rem; color:var(--text2); margin-bottom:1rem;" id="briefMeta"></div>
-        <button id="genBtn" onclick="generateBriefing()" style="
-          width:100%; padding:0.75rem; background:var(--accent); color:white;
-          border:none; border-radius:8px; font-size:0.9rem; font-weight:500;
-          cursor:pointer; font-family:inherit; margin-bottom:1.25rem;">▶ 브리핑 생성</button>
+      <div id="briefContentArea" style="display:none">
+        <div class="brief-meta" id="briefMeta"></div>
+        <button class="gen-btn" id="genBtn" onclick="generateBriefing()">▶ 브리핑 생성</button>
         <div id="briefResults"></div>
-        <button id="copyAllBtn" style="
-          display:none; width:100%; padding:0.65rem; background:var(--surface2);
-          color:var(--text2); border:1px solid var(--border); border-radius:8px;
-          font-size:0.85rem; cursor:pointer; font-family:inherit; margin-top:0.8rem;"
-          onclick="copyAllBriefs()">전체 브리핑 복사</button>
+        <button class="copy-all-btn" id="copyAllBtn" onclick="copyAllBriefs()">전체 브리핑 복사</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+/* ── AUTH ── */
 (function(){
-  if(sessionStorage.getItem('xi0_auth')!=='0610')
+  if(sessionStorage.getItem('xi0_auth')!=='0610'){
     window.location.href='/index.html';
+  }
 })();
 
-/* Theme Toggle */
-var isDark = localStorage.getItem('xi0_dark') === 'true';
-if(isDark) {
-  document.body.classList.add('dark-mode');
-  document.getElementById('themeToggle').textContent = '☀️';
-}
-
-function toggleTheme() {
-  document.body.classList.toggle('dark-mode');
-  isDark = document.body.classList.contains('dark-mode');
-  localStorage.setItem('xi0_dark', isDark);
-  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
-}
-
-/* Clock & Date */
+/* ── CLOCK ── */
 function updateClock(){
-  var now = new Date();
-  document.getElementById('clockEl').textContent = now.toLocaleTimeString('ko-KR',
-    {hour:'2-digit', minute:'2-digit', hour12:false});
+  var now=new Date();
+  document.getElementById('clockEl').textContent=
+    now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
+/* ── DATE ── */
 (function(){
-  var d = new Date();
-  var days = ['일','월','화','수','목','금','토'];
-  document.getElementById('dateEl').textContent = 
-    d.getFullYear() + '.' + (d.getMonth()+1).toString().padStart(2,'0') + 
-    '.' + d.getDate().toString().padStart(2,'0') + '(' + days[d.getDay()] + ')';
+  var d=new Date();
+  var days=['일','월','화','수','목','금','토'];
+  document.getElementById('dateEl').textContent=
+    d.getFullYear()+'.'+(d.getMonth()+1).toString().padStart(2,'0')+'.'+d.getDate().toString().padStart(2,'0')+'('+days[d.getDay()]+')';
 })();
 
-/* Calendar */
-var calYear, calMonth;
+/* ── SEARCH ── */
+function handleSearch(e){
+  if(e.key==='Enter'){
+    var q=document.getElementById('searchInput').value.trim();
+    if(q) window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank');
+  }
+}
+
+/* ── CALENDAR ── */
+var calYear,calMonth;
 (function(){
-  var now = new Date();
-  calYear = now.getFullYear();
-  calMonth = now.getMonth();
+  var now=new Date();
+  calYear=now.getFullYear();
+  calMonth=now.getMonth();
   renderCal();
 })();
 
 function renderCal(){
-  var months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-  document.getElementById('calTitle').textContent = calYear + '년 ' + months[calMonth];
-  var grid = document.getElementById('calGrid');
-  grid.innerHTML = '';
-  
-  ['일','월','화','수','목','금','토'].forEach(function(l){
-    var el = document.createElement('div');
-    el.className = 'cal-day-label';
-    el.textContent = l;
+  var months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('calTitle').textContent=calYear+'년 '+months[calMonth];
+  var grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  var labels=['일','월','화','수','목','금','토'];
+  labels.forEach(function(l){
+    var el=document.createElement('div');
+    el.className='cal-day-label';
+    el.textContent=l;
     grid.appendChild(el);
   });
-  
-  var first = new Date(calYear, calMonth, 1).getDay();
-  var last = new Date(calYear, calMonth+1, 0).getDate();
-  var prevLast = new Date(calYear, calMonth, 0).getDate();
-  var today = new Date();
-  var todayStr = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-  
-  for(var i=0; i<first; i++){
-    var el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = prevLast - first + 1 + i;
+  var first=new Date(calYear,calMonth,1).getDay();
+  var last=new Date(calYear,calMonth+1,0).getDate();
+  var prevLast=new Date(calYear,calMonth,0).getDate();
+  var today=new Date();
+  var todayStr=today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+  for(var i=0;i<first;i++){
+    var el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.textContent=prevLast-first+1+i;
     grid.appendChild(el);
   }
-  
-  for(var d=1; d<=last; d++){
-    var el = document.createElement('div');
-    var thisStr = calYear + '-' + (calMonth+1) + '-' + d;
-    el.className = 'cal-day' + (thisStr === todayStr ? ' today' : '');
-    el.textContent = d;
+  for(var d=1;d<=last;d++){
+    var el=document.createElement('div');
+    var dow=(first+d-1)%7;
+    var cls='cal-day';
+    if(dow===0) cls+=' sun';
+    var thisStr=calYear+'-'+(calMonth+1)+'-'+d;
+    if(thisStr===todayStr) cls+=' today';
+    el.className=cls;
+    el.textContent=d;
     grid.appendChild(el);
   }
-  
-  var remain = 42 - (first + last);
-  for(var n=1; n<=remain; n++){
-    var el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = n;
+  var remain=42-(first+last);
+  for(var n=1;n<=remain;n++){
+    var el=document.createElement('div');
+    el.className='cal-day other-month';
+    el.textContent=n;
     grid.appendChild(el);
   }
 }
 
 function changeMonth(dir){
-  calMonth += dir;
-  if(calMonth < 0){ calMonth = 11; calYear--; }
-  if(calMonth > 11){ calMonth = 0; calYear++; }
+  calMonth+=dir;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
   renderCal();
 }
 
-/* Briefing */
-function openBriefing(){
-  document.getElementById('briefModal').classList.add('open');
-  if(sessionStorage.getItem('brief_auth')==='0604')
-    showBriefContent();
+/* ── TODO ── */
+var todos=JSON.parse(localStorage.getItem('xi0_todos')||'[]');
+renderTodos();
+
+function saveTodos(){ localStorage.setItem('xi0_todos',JSON.stringify(todos)); }
+
+function addTodo(){
+  var inp=document.getElementById('todoInput');
+  var text=inp.value.trim();
+  if(!text) return;
+  todos.unshift({text:text,done:false,id:Date.now()});
+  saveTodos();
+  renderTodos();
+  inp.value='';
 }
 
+function toggleTodo(id){
+  todos=todos.map(function(t){ return t.id===id?{...t,done:!t.done}:t; });
+  saveTodos();
+  renderTodos();
+}
+
+function deleteTodo(id){
+  todos=todos.filter(function(t){ return t.id!==id; });
+  saveTodos();
+  renderTodos();
+}
+
+function renderTodos(){
+  var list=document.getElementById('todoList');
+  list.innerHTML='';
+  if(!todos.length){
+    list.innerHTML='<div style="font-size:0.75rem;color:var(--text3);padding:0.4rem 0.4rem;">할 일 없음</div>';
+    return;
+  }
+  todos.forEach(function(t){
+    var item=document.createElement('div');
+    item.className='todo-item'+(t.done?' done':'');
+    item.innerHTML=
+      '<div class="todo-check"></div>'+
+      '<span class="todo-text">'+escHtml(t.text)+'</span>'+
+      '<button class="todo-del" onclick="event.stopPropagation();deleteTodo('+t.id+')">✕</button>';
+    item.onclick=function(){ toggleTodo(t.id); };
+    list.appendChild(item);
+  });
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ── MEMO ── */
+var memoEl=document.getElementById('memoArea');
+memoEl.value=localStorage.getItem('xi0_memo')||'';
+updateMemoCount();
+
+memoEl.addEventListener('input',function(){
+  localStorage.setItem('xi0_memo',memoEl.value);
+  updateMemoCount();
+});
+
+function updateMemoCount(){
+  document.getElementById('memoCount').textContent=memoEl.value.length+'자';
+}
+
+/* ── BRIEFING ── */
+function openBriefing(){
+  document.getElementById('briefModal').classList.add('open');
+  if(sessionStorage.getItem('brief_auth')==='0604') showBriefContent();
+}
 function closeBriefing(){
   document.getElementById('briefModal').classList.remove('open');
 }
-
 function checkBriefAuth(){
-  if(document.getElementById('briefPw').value === '0604'){
-    sessionStorage.setItem('brief_auth', '0604');
+  if(document.getElementById('briefPw').value==='0604'){
+    sessionStorage.setItem('brief_auth','0604');
     showBriefContent();
   } else {
-    document.getElementById('briefAuthMsg').textContent = '암호가 틀렸습니다.';
+    document.getElementById('briefAuthMsg').textContent='암호가 틀렸습니다.';
   }
 }
-
 function showBriefContent(){
-  document.getElementById('briefAuthArea').style.display = 'none';
-  document.getElementById('briefContentArea').style.display = 'block';
-  var results = JSON.parse(sessionStorage.getItem('newsdesk_results') || '[]');
-  var date = sessionStorage.getItem('newsdesk_date') || '';
+  document.getElementById('briefAuthArea').style.display='none';
+  document.getElementById('briefContentArea').style.display='block';
+  var results=JSON.parse(sessionStorage.getItem('newsdesk_results')||'[]');
+  var date=sessionStorage.getItem('newsdesk_date')||'';
   if(!results.length){
-    document.getElementById('briefMeta').textContent = '수집된 데이터가 없습니다. 뉴스포커스에서 먼저 수집해주세요.';
-    document.getElementById('genBtn').disabled = true;
+    document.getElementById('briefMeta').textContent='수집된 데이터가 없습니다. 뉴스포커스에서 먼저 수집해주세요.';
+    document.getElementById('genBtn').disabled=true;
   } else {
-    document.getElementById('briefMeta').textContent = date + ' · ' + results.length + '개 키워드';
+    document.getElementById('briefMeta').textContent=date+' · '+results.length+'개 키워드';
   }
 }
 
-var GEMINI_ENDPOINT = 'https://news-api-three.vercel.app/api/gemini';
-var _briefs = [];
+var GEMINI_ENDPOINT='https://news-api-three.vercel.app/api/gemini';
+var _briefs=[];
 
 async function generateBriefing(){
-  var results = JSON.parse(sessionStorage.getItem('newsdesk_results') || '[]');
+  var results=JSON.parse(sessionStorage.getItem('newsdesk_results')||'[]');
   if(!results.length) return;
-  var btn = document.getElementById('genBtn');
-  btn.disabled = true;
-  btn.textContent = '생성 중...';
-  document.getElementById('briefResults').innerHTML = '';
-  document.getElementById('copyAllBtn').style.display = 'none';
-  _briefs = [];
-
-  for(var i=0; i<results.length; i++){
-    var item = results[i];
-    if(!item.articles || !item.articles.length) continue;
-    var top15 = item.articles.slice(0, 15);
-    var articleLines = top15.map(function(a, j){
-      return (j+1) + '. ' + a.title + ' (' + a.dateStr + ')';
-    }).join('\n');
-
-    var promptText = '보건의료복지 분야 전문 분석가입니다. "' + item.text + '" 키워드 뉴스를 분석해 브리핑을 작성하세요.\n기사:\n' + articleLines + '\n아래 JSON만 출력하세요:\n{"tag":"긴급 또는 주목 또는 동향","summary":"3문장 이상 요약","refs":[{"title":"제목","url":"주소"},{"title":"제목","url":"주소"},{"title":"제목","url":"주소"}],"beneficiary":"수혜자 관점 2문장","civic":"시민단체 관점 2문장"}';
-
+  var btn=document.getElementById('genBtn');
+  btn.disabled=true; btn.textContent='생성 중...';
+  document.getElementById('briefResults').innerHTML='';
+  document.getElementById('copyAllBtn').style.display='none';
+  _briefs=[];
+  for(var i=0;i<results.length;i++){
+    var item=results[i];
+    if(!item.articles||!item.articles.length) continue;
+    var top15=item.articles.slice(0,15);
+    var articleLines=top15.map(function(a,j){ return (j+1)+'. '+a.title+' ('+a.dateStr+')'; }).join('\n');
+    var promptText='보건의료복지 분야 전문 분석가입니다. "'+item.text+'" 키워드 뉴스를 분석해 브리핑을 작성하세요.\n기사:\n'+articleLines+'\n아래 JSON만 출력하세요:\n{"tag":"긴급 또는 주목 또는 동향","summary":"3문장 이상 요약","refs":[{"title":"제목","url":"주소"},{"title":"제목","url":"주소"},{"title":"제목","url":"주소"}],"beneficiary":"수혜자 관점 2문장","civic":"시민단체 관점 2문장"}';
     try {
-      var res = await fetch(GEMINI_ENDPOINT, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({contents: [{parts: [{text: promptText}]}]})
-      });
-      var data = await res.json();
-      var rawText = '';
-      if(data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts){
-        rawText = data.candidates[0].content.parts[0].text || '';
+      var res=await fetch(GEMINI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:promptText}]}]})});
+      var data=await res.json();
+      var rawText='';
+      if(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts){
+        rawText=data.candidates[0].content.parts[0].text||'';
       }
-      var clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-      var b = JSON.parse(clean);
-      _briefs.push({keyword: item.text, tag: b.tag, summary: b.summary, refs: b.refs, beneficiary: b.beneficiary, civic: b.civic});
-
-      var tc = b.tag === '긴급' ? '#f44336' : b.tag === '주목' ? '#ff9800' : '#9c27b0';
-      var rh = (b.refs || []).map(function(ref, ri){
-        return '<div style="font-size:0.8rem;padding:0.15rem 0;"><a href="' + (ref.url||'#') + '" target="_blank" style="color:var(--accent2);text-decoration:none;">' + (ref.title||'') + '</a></div>';
+      var clean=rawText.replace(/```json/g,'').replace(/```/g,'').trim();
+      var b=JSON.parse(clean);
+      _briefs.push({keyword:item.text,tag:b.tag,summary:b.summary,refs:b.refs,beneficiary:b.beneficiary,civic:b.civic});
+      var tagColor=b.tag==='긴급'?'#f76a6a':b.tag==='주목'?'#f7a94f':'#7c6af7';
+      var refsHtml=(b.refs||[]).map(function(ref,ri){
+        return '<div style="font-size:0.78rem;padding:0.15rem 0">'+(ri+1)+'. <a href="'+(ref.url||'#')+'" target="_blank" style="color:var(--accent2);text-decoration:none">'+(ref.title||'')+'</a></div>';
       }).join('');
-
-      var html = '<div style="border:1px solid var(--border);border-radius:10px;margin-bottom:1rem;overflow:hidden;">'
-        + '<div style="padding:1rem;border-bottom:1px solid var(--border);">'
-        + '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem;">'
-        + '<span style="font-weight:600;font-size:0.95rem;">' + item.text + '</span>'
-        + '<span style="font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:100px;background:' + tc + '22;color:' + tc + ';border:1px solid ' + tc + '44;">' + b.tag + '</span>'
-        + '</div>'
-        + '<p style="font-size:0.85rem;line-height:1.8;word-break:keep-all;">' + b.summary + '</p>'
-        + '</div>'
-        + '<div style="padding:0.8rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border);">'
-        + '<div style="font-size:0.7rem;color:var(--text2);text-transform:uppercase;margin-bottom:0.4rem;">참고 기사</div>'
-        + rh
-        + '</div>'
-        + '<div style="padding:0.8rem 1rem;border-bottom:1px solid var(--border);">'
-        + '<div style="font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.4rem;color:#2196f3;">정책 수혜자 관점</div>'
-        + '<p style="font-size:0.85rem;line-height:1.7;word-break:keep-all;">' + b.beneficiary + '</p>'
-        + '</div>'
-        + '<div style="padding:0.8rem 1rem;">'
-        + '<div style="font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.4rem;color:#4caf50;">정책 시민단체 관점</div>'
-        + '<p style="font-size:0.85rem;line-height:1.7;word-break:keep-all;">' + b.civic + '</p>'
-        + '</div>'
-        + '</div>';
-
-      document.getElementById('briefResults').innerHTML += html;
+      var html='<div class="brief-item">';
+      html+='<div class="brief-item-header">';
+      html+='<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">';
+      html+='<span style="font-weight:700;font-size:0.95rem">'+item.text+'</span>';
+      html+='<span style="font-size:0.68rem;padding:0.2rem 0.5rem;border-radius:100px;background:'+tagColor+'22;color:'+tagColor+';border:1px solid '+tagColor+'44">'+b.tag+'</span>';
+      html+='</div>';
+      html+='<p style="font-size:0.84rem;line-height:1.8;word-break:keep-all">'+b.summary+'</p>';
+      html+='</div>';
+      html+='<div class="brief-item-refs"><div style="font-size:0.68rem;color:var(--text2);text-transform:uppercase;margin-bottom:0.4rem">참고 기사</div>'+refsHtml+'</div>';
+      html+='<div class="brief-item-persp"><div class="persp-label" style="color:#4fc3f7">정책 수혜자 관점</div><p class="persp-text">'+b.beneficiary+'</p></div>';
+      html+='<div class="brief-item-persp"><div class="persp-label" style="color:#4caf82">정책 시민단체 관점</div><p class="persp-text">'+b.civic+'</p></div>';
+      html+='</div>';
+      document.getElementById('briefResults').innerHTML+=html;
     } catch(err){
-      document.getElementById('briefResults').innerHTML += '<div style="padding:0.8rem;color:#f44336;font-size:0.85rem;">「' + item.text + '」 생성 실패</div>';
+      document.getElementById('briefResults').innerHTML+='<div style="padding:0.8rem;color:#f76a6a;font-size:0.82rem">「'+item.text+'」 생성 실패</div>';
     }
-    await new Promise(function(r){ setTimeout(r, 2000); });
+    await new Promise(function(r){ setTimeout(r,2000); });
   }
-
-  btn.disabled = false;
-  btn.textContent = '▶ 브리핑 재생성';
-  if(_briefs.length)
-    document.getElementById('copyAllBtn').style.display = 'block';
+  btn.disabled=false; btn.textContent='▶ 브리핑 재생성';
+  if(_briefs.length) document.getElementById('copyAllBtn').style.display='block';
 }
 
 function copyAllBriefs(){
   if(!_briefs.length) return;
-  var text = _briefs.map(function(b){
-    var refsText = (b.refs || []).map(function(r, i){ return (i+1) + '. ' + r.title + ' ' + r.url; }).join('\n');
-    return '【' + b.keyword + '】 [' + b.tag + ']\n\n' + b.summary + '\n\n참고 기사\n' + refsText + '\n\n▸ 정책 수혜자 관점\n' + b.beneficiary + '\n\n▸ 정책 시민단체 관점\n' + b.civic;
+  var text=_briefs.map(function(b){
+    var refsText=(b.refs||[]).map(function(r,i){ return (i+1)+'. '+r.title+' '+r.url; }).join('\n');
+    return '【'+b.keyword+'】 ['+b.tag+']\n\n'+b.summary+'\n\n참고 기사\n'+refsText+'\n\n▸ 정책 수혜자 관점\n'+b.beneficiary+'\n\n▸ 정책 시민단체 관점\n'+b.civic;
   }).join('\n\n──────────────────────────────\n\n');
   navigator.clipboard.writeText(text).then(function(){
-    var btn = document.getElementById('copyAllBtn');
-    btn.textContent = '✓ 복사됨';
-    setTimeout(function(){ btn.textContent = '전체 브리핑 복사'; }, 2000);
+    var btn=document.getElementById('copyAllBtn');
+    btn.textContent='✓ 복사됨';
+    setTimeout(function(){ btn.textContent='전체 브리핑 복사'; },2000);
   });
 }
 </script>
 </body>
 </html>
+
